@@ -1,0 +1,42 @@
+{
+  "name": "@project-context/core",
+  "version": "4.0.0",
+  "description": "Universal Project Context OS — Portable, repository-local multi-agent context and MCP server",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./*"
+  },
+  "bin": {
+    "project-context": "bin/project-context.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "README.md"
+  ],
+  "scripts": {
+    "mcp": "node bin/project-context.js mcp",
+    "test": "node tests/run-all-tests.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "zod": "^3.24.2"
+  },
+  "keywords": [
+    "context",
+    "mcp",
+    "multi-agent",
+    "agent-handoff",
+    "developer-experience"
+  ],
+  "license": "MIT",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "devDependencies": {},
+  "author": ""
+}

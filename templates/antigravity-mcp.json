@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "project-context": {
+      "command": "npx",
+      "args": ["@project-context/core", "mcp"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
