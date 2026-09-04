@@ -116,21 +116,44 @@ async function runComprehensiveLoopbackTests() {
     ];
 
     for (const name of expectedToolNames) {
-      assert(tools.some((t) => t.name === name), `Curated tool '${name}' is registered`);
+      const toolDef = tools.find((t) => t.name === name);
+      assert(Boolean(toolDef), `Curated tool '${name}' is registered`);
+      assert(toolDef?.annotations?.readOnlyHint === true, `Tool '${name}' has readOnlyHint: true`);
+      assert(toolDef?.annotations?.destructiveHint === false, `Tool '${name}' has destructiveHint: false`);
+      assert(
+        Boolean(toolDef?.outputSchema && typeof toolDef.outputSchema === "object"),
+        `Tool '${name}' exposes hardened outputSchema on tools/list`
+      );
     }
 
     // Ensure zero dangerous tools
-    const forbiddenPatterns = ["write", "update", "create", "delete", "exec", "shell", "start_session", "recover"];
+    const forbiddenPatterns = ["write", "update", "create", "delete", "exec", "shell", "start_session", "recover", "modify", "edit"];
     const foundForbidden = tools.filter((t) => forbiddenPatterns.some((p) => t.name.includes(p)));
     assert(foundForbidden.length === 0, "Surface guard: Zero write, lifecycle, or execution tools registered");
 
-    // Helper to invoke a tool and verify text content
+    // Helper to invoke a tool and verify text content and structured content
     async function invokeTool(name, args = {}) {
       const res = await client.callTool({ name, arguments: args });
       assert(!res.isError, `Tool '${name}' invocation succeeded without isError flag`);
       assert(Array.isArray(res.content) && res.content.length === 1, `Tool '${name}' returned 1 content block`);
+      assert(
+        Boolean(res.structuredContent !== undefined),
+        `Tool '${name}' returned structuredContent alongside text content`
+      );
       const text = res.content[0]?.text || "";
-      return { raw: text, parsed: JSON.parse(text) };
+      let parsed;
+      if (res.structuredContent && typeof res.structuredContent === "object") {
+        if (res.structuredContent.result !== undefined) {
+          parsed = res.structuredContent.result;
+        } else if (res.structuredContent.content !== undefined) {
+          parsed = res.structuredContent.content;
+        } else {
+          parsed = res.structuredContent;
+        }
+      } else {
+        parsed = JSON.parse(text);
+      }
+      return { raw: text, parsed, structuredContent: res.structuredContent };
     }
 
     // 4. Tool 1: get_context_snapshot
@@ -294,22 +317,20 @@ async function runComprehensiveLoopbackTests() {
   }
   assert(cliRootBlocked, "getTargetProjectRoot cleanly rejects invalid --root arguments");
 
-  // 14. Phase 4: Authentication & Security Boundary Verification
-  console.log("\n── 14. Phase 4: Authentication & Security Boundary Verification ──");
-  const testSecret = "pc-test-secret-a1b2c3d4e5f6g7h8";
+  // 14. Phase 4E-B: No-Auth Transport & Security Boundary Verification
+  console.log("\n── 14. Phase 4E-B: No-Auth Transport & Security Boundary Verification ──");
 
-  // Start an authenticated instance of the adapter on an ephemeral port
-  const authAdapter = await startChatGPTAdapter({
+  // Start a fresh adapter instance on an ephemeral loopback port with No Auth
+  const noAuthAdapter = await startChatGPTAdapter({
     rootDir: testRoot,
-    port: 0,
-    secret: testSecret
+    port: 0
   });
 
-  assert(Boolean(authAdapter.server), "Authenticated server started successfully");
-  assert(authAdapter.port > 0, `Authenticated server bound to port ${authAdapter.port}`);
+  assert(Boolean(noAuthAdapter.server), "No-Auth server started successfully");
+  assert(noAuthAdapter.port > 0, `No-Auth server bound to port ${noAuthAdapter.port}`);
 
-  // Test A: Request with NO Authorization header returns 401
-  const noAuthRes = await fetch(authAdapter.url, {
+  // Test 1: Raw POST tools/list without ANY Authorization header succeeds (HTTP 200)
+  const noAuthPostRes = await fetch(noAuthAdapter.url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -317,80 +338,130 @@ async function runComprehensiveLoopbackTests() {
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
-      id: "auth-test-1",
+      id: "no-auth-test-1",
       method: "tools/list",
       params: {}
     })
   });
-  assert(noAuthRes.status === 401, `Unauthenticated request returned 401 Unauthorized (got ${noAuthRes.status})`);
-  assert(noAuthRes.headers.get("www-authenticate")?.includes("Bearer"), "401 response contains WWW-Authenticate Bearer header");
+  assert(noAuthPostRes.status === 200, `Raw POST without Authorization header returned 200 OK (got ${noAuthPostRes.status})`);
+  assert(!noAuthPostRes.headers.get("www-authenticate"), "No WWW-Authenticate header returned (no auth challenge)");
 
-  // Test B: Request with WRONG Bearer token returns 401
-  const wrongAuthRes = await fetch(authAdapter.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json, text/event-stream",
-      "Authorization": "Bearer wrong-invalid-secret-key-12345"
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "auth-test-2",
-      method: "tools/list",
-      params: {}
-    })
-  });
-  assert(wrongAuthRes.status === 401, `Invalid secret request returned 401 Unauthorized (got ${wrongAuthRes.status})`);
+  const rawText = await noAuthPostRes.text();
+  let discoveredToolsCount = 0;
+  if (rawText.startsWith("event:") || rawText.includes("data:")) {
+    const dataLine = rawText.split("\n").find((l) => l.startsWith("data:"));
+    if (dataLine) {
+      const parsed = JSON.parse(dataLine.replace(/^data:\s*/, ""));
+      discoveredToolsCount = parsed.result?.tools?.length || 0;
+    }
+  } else {
+    const parsed = JSON.parse(rawText);
+    discoveredToolsCount = parsed.result?.tools?.length || 0;
+  }
+  assert(discoveredToolsCount === 8, `Raw POST tools/list discovered exactly 8 tools (got ${discoveredToolsCount})`);
 
-  // Test C: Request with DIFFERENT LENGTH Bearer token returns 401
-  const diffLenAuthRes = await fetch(authAdapter.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json, text/event-stream",
-      "Authorization": "Bearer short"
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "auth-test-3",
-      method: "tools/list",
-      params: {}
-    })
-  });
-  assert(diffLenAuthRes.status === 401, `Different length secret returned 401 Unauthorized (got ${diffLenAuthRes.status})`);
-
-  // Test D: Full MCP Client connecting WITH valid Authorization header succeeds
-  const authClient = new Client(
-    { name: "chatgpt-phase4-auth-client", version: "1.0.0" },
+  // Test 2: Connect full MCP client over Streamable HTTP WITHOUT Authorization
+  const noAuthClient = new Client(
+    { name: "chatgpt-phase4e-noauth-client", version: "1.0.0" },
     { capabilities: {} }
   );
-  const authTransport = new StreamableHTTPClientTransport(new URL(authAdapter.url), {
-    requestInit: {
-      headers: {
-        Authorization: `Bearer ${testSecret}`
-      }
-    }
-  });
+  const noAuthTransport = new StreamableHTTPClientTransport(new URL(noAuthAdapter.url));
 
-  await authClient.connect(authTransport);
-  assert(true, "Authenticated MCP client connected successfully with valid Bearer token");
+  await noAuthClient.connect(noAuthTransport);
+  assert(true, "Client successfully established MCP connection over Streamable HTTP without Authorization");
 
-  const authTools = await authClient.listTools();
-  assert(authTools.tools.length === 8, `Authenticated client discovered exactly 8 tools (got ${authTools.tools.length})`);
+  // Test 3: tools/list succeeds without authentication
+  const noAuthTools = await noAuthClient.listTools();
+  assert(noAuthTools.tools.length === 8, `MCP tools/list without auth returned exactly 8 tools (got ${noAuthTools.tools.length})`);
 
-  // Test Tool Call over authenticated connection
-  const snapshotRes = await authClient.callTool({
+  // Test 4: All 8 tools have readOnly annotations and valid outputSchema
+  for (const t of noAuthTools.tools) {
+    assert(t.annotations?.readOnlyHint === true, `Tool '${t.name}' verifies readOnlyHint: true`);
+    assert(t.annotations?.destructiveHint === false, `Tool '${t.name}' verifies destructiveHint: false`);
+    assert(
+      Boolean(t.outputSchema && typeof t.outputSchema === "object" && t.outputSchema.type),
+      `Tool '${t.name}' advertises valid outputSchema with type '${t.outputSchema?.type}'`
+    );
+  }
+
+  // Test 5: Representative read calls succeed: get_context_snapshot, get_project_state, get_tasks, get_architecture
+  const snapCall = await noAuthClient.callTool({
     name: "get_context_snapshot",
     arguments: { limit: 2 }
   });
-  assert(!snapshotRes.isError, "Authenticated client successfully called get_context_snapshot");
-  assert(snapshotRes.content[0].text.length > 0, "Snapshot result payload is non-empty");
+  assert(!snapCall.isError, "get_context_snapshot succeeds over No-Auth transport");
+  const snapParsed = JSON.parse(snapCall.content[0].text);
+  assert(snapParsed._type === "HotContextSnapshot", "Snapshot type is HotContextSnapshot");
+  assertNoSecrets(snapParsed, "noauth.get_context_snapshot");
 
-  await authClient.close();
-  await authAdapter.server.close();
+  const stateCall = await noAuthClient.callTool({
+    name: "get_project_state",
+    arguments: {}
+  });
+  assert(!stateCall.isError, "get_project_state succeeds over No-Auth transport");
+  const stateParsed = JSON.parse(stateCall.content[0].text);
+  assert(stateParsed.meta?.project_name === (isTemp ? "TestProject" : "CareerOS"), "get_project_state matches target project");
+  assertNoSecrets(stateParsed, "noauth.get_project_state");
+
+  const tasksCall = await noAuthClient.callTool({
+    name: "get_tasks",
+    arguments: { limit: 5 }
+  });
+  assert(!tasksCall.isError, "get_tasks succeeds over No-Auth transport");
+  const tasksParsed = JSON.parse(tasksCall.content[0].text);
+  assert(tasksParsed.count <= 5, "get_tasks respects limit bound <= 5");
+  assertNoSecrets(tasksParsed, "noauth.get_tasks");
+
+  const archCall = await noAuthClient.callTool({
+    name: "get_architecture",
+    arguments: {}
+  });
+  assert(!archCall.isError, "get_architecture succeeds over No-Auth transport");
+  assert(archCall.content[0].text.length > 0, "get_architecture text is non-empty");
+  assertNoSecrets(archCall.content[0].text, "noauth.get_architecture");
+
+  // Test 6: Input Validation & Boundary Enforcement
+  // 6a: Oversized query in search_project_context (> 200 chars)
+  const oversizedQuery = "A".repeat(250);
+  const oversizedSearch = await noAuthClient.callTool({
+    name: "search_project_context",
+    arguments: { query: oversizedQuery }
+  });
+  assert(oversizedSearch.isError === true, "Oversized search query (>200 chars) rejected safely with isError flag");
+
+  // 6b: Search with bounded limit
+  const boundedSearch = await noAuthClient.callTool({
+    name: "search_project_context",
+    arguments: { query: isTemp ? "TestProject" : "CareerOS", limit: 3 }
+  });
+  assert(!boundedSearch.isError, "Bounded search succeeded");
+  const boundedSearchParsed = JSON.parse(boundedSearch.content[0].text);
+  assert(boundedSearchParsed.match_count <= 3, `Search results safely bounded by limit <= 3 (got ${boundedSearchParsed.match_count})`);
+
+  // Test 7: Security Negative Invariance
+  // Remote caller cannot specify root/path override parameters
+  const paramsSnap = await noAuthClient.callTool({
+    name: "get_context_snapshot",
+    arguments: { projectRoot: "C:/Windows/System32", root: "C:/Windows", path: "C:/" }
+  });
+  assert(!paramsSnap.isError, "Arbitrary extra path parameters safely ignored by get_context_snapshot");
+  const paramsSnapParsed = JSON.parse(paramsSnap.content[0].text);
+  assert(paramsSnapParsed.project?.name === (isTemp ? "TestProject" : "CareerOS"), "Fixed project root preserved, cannot be overridden");
+
+  // Test 8: Safe Error Sanitization (no leaked filesystem absolute paths)
+  const emptySearchCall = await noAuthClient.callTool({
+    name: "search_project_context",
+    arguments: { query: "   " }
+  });
+  assert(emptySearchCall.isError === true, "Empty search query returns isError: true");
+  assert(!emptySearchCall.content[0].text.includes(":\\"), "Error message contains zero absolute filesystem paths");
+  assert(!emptySearchCall.content[0].text.includes("C:/Users"), "Error message contains zero local user directory paths");
+
+  await noAuthClient.close();
+  await noAuthAdapter.server.close();
 
   console.log("\n================================================================");
-  console.log(`Phase 4 Comprehensive Test Results: ${passed} passed, ${failed} failed`);
+  console.log(`Phase 4E-B Comprehensive Test Results: ${passed} passed, ${failed} failed`);
   console.log("================================================================\n");
 
   if (failed > 0) {

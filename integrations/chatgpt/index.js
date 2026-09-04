@@ -94,8 +94,6 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
     throw new Error(`Target project root does not exist: '${resolvedRoot}'`);
   }
 
-  const secret = options.secret !== undefined ? options.secret : process.env.CHATGPT_MCP_SECRET;
-
   const serverConfig = {
     name: "project-context-chatgpt",
     version: "1.0.0"
@@ -111,58 +109,237 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
 
   const server = new MCPServer(serverConfig);
 
-  // Authentication Middleware (Constant-time Bearer token validation)
-  if (secret && typeof secret === "string" && secret.trim() !== "") {
-    const expectedSecret = secret.trim();
-    const expectedBuffer = Buffer.from(expectedSecret, "utf-8");
+  // ───────────────────────────────────────────────────────────────────────────
+  // MCP OUTPUT SCHEMAS (Hardening for ChatGPT Web & typed MCP clients)
+  // ───────────────────────────────────────────────────────────────────────────
+  const OUTPUT_SCHEMAS = {
+    get_context_snapshot: fromJsonSchema({
+      type: "object",
+      properties: {
+        _type: { type: "string" },
+        version: { type: "string" },
+        generated_at: { type: "string" },
+        project: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            phase: { type: "string" },
+            status: { type: "string" },
+            objective: { type: "string" },
+            last_context_update: { type: "string" },
+            last_agent: { type: "string" },
+            current_agent: { type: ["object", "null"] }
+          },
+          required: ["name", "status"]
+        },
+        active_agents: { type: "array" },
+        active_tasks: { type: "array" },
+        latest_handoff: { type: ["object", "null"] },
+        recent_changes: { type: "array" },
+        recent_decisions: { type: "array" },
+        git: { type: ["object", "null"] },
+        cold_context_pointers: { type: "object" }
+      },
+      required: ["_type", "generated_at", "project", "active_tasks", "cold_context_pointers"]
+    }),
 
-    server.use(async (c, next) => {
-      const authHeader = c.req.header("authorization") || c.req.header("Authorization");
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return c.text("Unauthorized: Missing or invalid Authorization header", 401, {
-          "WWW-Authenticate": 'Bearer realm="ProjectContext"'
-        });
+    get_project_state: fromJsonSchema({
+      type: "object",
+      properties: {
+        exists: { type: "boolean" },
+        meta: { type: ["object", "null"] },
+        raw: { type: "string" }
+      },
+      required: ["exists", "raw"]
+    }),
+
+    get_tasks: fromJsonSchema({
+      type: "object",
+      properties: {
+        count: { type: "integer" },
+        total_matched: { type: "integer" },
+        status_filter: { type: "string" },
+        tasks: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              title: { type: "string" },
+              status: { type: "string" },
+              priority: { type: "string" },
+              owner: { type: "string" },
+              created_date: { type: "string" },
+              updated_date: { type: "string" },
+              dependencies: { type: "string" },
+              description: { type: "string" },
+              acceptance_criteria: {
+                type: "array",
+                items: { type: "string" }
+              }
+            },
+            required: ["id", "title", "status"]
+          }
+        }
+      },
+      required: ["count", "total_matched", "status_filter", "tasks"]
+    }),
+
+    get_architecture: fromJsonSchema({
+      type: "object",
+      properties: {
+        content: {
+          type: "string",
+          description: "Authoritative markdown specification and invariants of ARCHITECTURE.md"
+        }
+      },
+      required: ["content"]
+    }),
+
+    get_decisions: fromJsonSchema({
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          title: { type: "string" },
+          date: { type: "string" },
+          status: { type: "string" },
+          decision: { type: "string" },
+          context: { type: "string" },
+          reason: { type: "string" },
+          raw: { type: "string" }
+        },
+        required: ["id", "title", "status", "decision"]
       }
+    }),
 
-      const token = authHeader.slice(7).trim();
-      const tokenBuffer = Buffer.from(token, "utf-8");
+    search_project_context: fromJsonSchema({
+      type: "object",
+      properties: {
+        query: { type: "string" },
+        match_count: { type: "integer" },
+        total_matches: { type: "integer" },
+        matches: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              file: { type: "string" },
+              lineNumber: { type: "integer" },
+              lineContent: { type: "string" }
+            },
+            required: ["file", "lineNumber", "lineContent"]
+          }
+        }
+      },
+      required: ["query", "match_count", "total_matches", "matches"]
+    }),
 
-      if (
-        tokenBuffer.length !== expectedBuffer.length ||
-        !crypto.timingSafeEqual(tokenBuffer, expectedBuffer)
-      ) {
-        return c.text("Unauthorized: Invalid Bearer token", 401, {
-          "WWW-Authenticate": 'Bearer realm="ProjectContext"'
-        });
-      }
+    get_relevant_context: fromJsonSchema({
+      type: "object",
+      properties: {
+        query_context: {
+          type: "object",
+          properties: {
+            task_id: { type: "string" },
+            query: { type: "string" },
+            files: { type: "array", items: { type: "string" } }
+          }
+        },
+        relevant_decisions: { type: "array" },
+        relevant_changes: { type: "array" },
+        relevant_completed_tasks: { type: "array" },
+        suggested_files: { type: "array", items: { type: "string" } }
+      },
+      required: ["query_context", "relevant_decisions", "relevant_changes", "suggested_files"]
+    }),
 
-      await next();
-    });
-  }
+    get_git_status: fromJsonSchema({
+      type: "object",
+      properties: {
+        branch: { type: "string" },
+        isClean: { type: "boolean" },
+        staged: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              path: { type: "string" },
+              status: { type: "string" }
+            },
+            required: ["path", "status"]
+          }
+        },
+        unstaged: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              path: { type: "string" },
+              status: { type: "string" }
+            },
+            required: ["path", "status"]
+          }
+        },
+        untracked: {
+          type: "array",
+          items: { type: "string" }
+        },
+        totalChanges: { type: "integer" }
+      },
+      required: ["branch", "isClean", "staged", "unstaged", "untracked"]
+    })
+  };
 
-  // Helper to format safe success responses
+  // Helper to format safe success responses (providing both text content and structuredContent)
   const formatResponse = (data, toolName) => {
     assertNoSecrets(data, toolName);
+
+    const text = typeof data === "string"
+      ? data
+      : (data && typeof data === "object" && typeof data.content === "string" && Object.keys(data).length === 1)
+        ? data.content
+        : JSON.stringify(data, null, 2);
+
+    const structuredContent = (typeof data === "string")
+      ? { content: data }
+      : data;
+
     return {
       content: [
         {
           type: "text",
-          text: typeof data === "string" ? data : JSON.stringify(data, null, 2)
+          text
+        }
+      ],
+      structuredContent
+    };
+  };
+
+  // Helper to format safe error responses without leaking internal filesystem paths or stack traces
+  const formatError = (err) => {
+    const rawMsg = err instanceof Error ? err.message : String(err);
+    // Sanitize any absolute paths that might leak
+    const sanitizedMsg = rawMsg.replace(/([a-zA-Z]:\\[^:\n\r"']+)|(\/[a-zA-Z0-9_\-\.\/]+)/g, "<path>");
+    return {
+      isError: true,
+      content: [
+        {
+          type: "text",
+          text: `Error: ${sanitizedMsg}`
         }
       ]
     };
   };
 
-  // Helper to format error responses
-  const formatError = (err) => ({
-    isError: true,
-    content: [
-      {
-        type: "text",
-        text: `Error: ${err instanceof Error ? err.message : String(err)}`
-      }
-    ]
-  });
+  // Read-only annotations contract for all curated tools
+  const READ_ONLY_ANNOTATIONS = {
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false
+  };
 
   // ───────────────────────────────────────────────────────────────────────────
   // TOOL 1: get_context_snapshot (Primary Hot Context Bootstrap)
@@ -170,8 +347,10 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_context_snapshot",
+      title: "Get Context Snapshot",
       description:
         "Primary bootstrap tool. Returns synthesized Hot Context: project identity, current status, active agent work, priority tasks, latest handoff, recent decisions, uncommitted git status, and cold context pointers.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {
@@ -198,7 +377,8 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
             description: "Include recent architectural decisions"
           }
         }
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_context_snapshot
     },
     async (args = {}) => {
       try {
@@ -222,12 +402,15 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_project_state",
+      title: "Get Project State",
       description:
         "Returns the authoritative project status snapshot and metadata from .project-context/STATE.md.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {}
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_project_state
     },
     async () => {
       try {
@@ -250,8 +433,10 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_tasks",
+      title: "Get Tasks",
       description:
         "Returns project tasks from .project-context/TASKS.md, optionally filtered by status (BACKLOG, READY, IN_PROGRESS, BLOCKED, COMPLETED, CANCELLED).",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {
@@ -259,17 +444,28 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
             type: "string",
             enum: ["BACKLOG", "READY", "IN_PROGRESS", "BLOCKED", "COMPLETED", "CANCELLED"],
             description: "Optional status filter"
+          },
+          limit: {
+            type: "integer",
+            minimum: 1,
+            maximum: 50,
+            default: 50,
+            description: "Maximum number of tasks to return (1-50, default 50)"
           }
         }
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_tasks
     },
     async (args = {}) => {
       try {
         const res = readTasks(resolvedRoot, args.status);
+        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 50;
+        const tasks = (res.tasks || []).slice(0, limit);
         const payload = {
-          count: res.tasks.length,
+          count: tasks.length,
+          total_matched: res.tasks.length,
           status_filter: args.status || "ALL",
-          tasks: res.tasks
+          tasks
         };
         return formatResponse(payload, "get_tasks");
       } catch (err) {
@@ -284,12 +480,15 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_architecture",
+      title: "Get Architecture",
       description:
         "Returns the project architecture specification, system boundaries, and architectural invariants from .project-context/ARCHITECTURE.md.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {}
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_architecture
     },
     async () => {
       try {
@@ -308,8 +507,10 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_decisions",
+      title: "Get Decisions",
       description:
         "Returns Architectural Decision Records (ADRs) from .project-context/DECISIONS.md.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {
@@ -321,12 +522,13 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
             description: "Maximum number of decisions to return (most recent first)"
           }
         }
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_decisions
     },
     async (args = {}) => {
       try {
         const res = readDecisions(resolvedRoot);
-        const limit = typeof args.limit === "number" ? args.limit : 20;
+        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 20;
         const decisions = (res.decisions || []).slice(-limit).reverse();
         return formatResponse(decisions, "get_decisions");
       } catch (err) {
@@ -341,8 +543,10 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "search_project_context",
+      title: "Search Project Context",
       description:
         "Searches across all .project-context/ markdown files for keywords, concepts, or historical records.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {
@@ -350,22 +554,36 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
             type: "string",
             minLength: 1,
             maxLength: 200,
-            description: "Keyword or phrase to search for"
+            description: "Keyword or phrase to search for (1-200 characters)"
+          },
+          limit: {
+            type: "integer",
+            minimum: 1,
+            maximum: 50,
+            default: 25,
+            description: "Maximum number of search matches to return (1-50, default 25)"
           }
         },
         required: ["query"]
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.search_project_context
     },
     async (args = {}) => {
       try {
-        if (!args.query || args.query.trim() === "") {
+        if (!args.query || typeof args.query !== "string" || args.query.trim() === "") {
           return formatError(new Error("Search query must not be empty."));
         }
+        if (args.query.length > 200) {
+          return formatError(new Error("Search query exceeds maximum length of 200 characters."));
+        }
         const matches = searchProjectContext(resolvedRoot, args.query.trim());
+        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 25;
+        const boundedMatches = matches.slice(0, limit);
         const payload = {
           query: args.query.trim(),
-          match_count: matches.length,
-          matches
+          match_count: boundedMatches.length,
+          total_matches: matches.length,
+          matches: boundedMatches
         };
         return formatResponse(payload, "search_project_context");
       } catch (err) {
@@ -380,8 +598,10 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_relevant_context",
+      title: "Get Relevant Context",
       description:
         "Computes deterministic, ranked Warm Context for a specific task or query: relevant ADRs, recent changes, completed tasks, and candidate files.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {
@@ -402,25 +622,26 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
               type: "string",
               maxLength: 200
             },
-            description: "Optional list of relevant files being inspected"
+            description: "Optional list of relevant files being inspected (max 20)"
           },
           limit: {
             type: "integer",
             minimum: 1,
             maximum: 20,
             default: 5,
-            description: "Maximum items per category"
+            description: "Maximum items per category (1-20, default 5)"
           }
         }
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_relevant_context
     },
     async (args = {}) => {
       try {
         const options = {
-          task_id: args.task_id || undefined,
-          query: args.query || undefined,
-          files: Array.isArray(args.files) ? args.files : undefined,
-          limit: typeof args.limit === "number" ? args.limit : 5
+          task_id: args.task_id ? String(args.task_id).slice(0, 50) : undefined,
+          query: args.query ? String(args.query).slice(0, 200) : undefined,
+          files: Array.isArray(args.files) ? args.files.slice(0, 20).map(f => String(f).slice(0, 200)) : undefined,
+          limit: typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 20) : 5
         };
         const relevant = getRelevantContext(resolvedRoot, options);
         return formatResponse(relevant, "get_relevant_context");
@@ -436,12 +657,15 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
   server.tool(
     {
       name: "get_git_status",
+      title: "Get Git Status",
       description:
         "Returns Git working tree status: current branch, staged modifications, unstaged modifications, and untracked files.",
+      annotations: READ_ONLY_ANNOTATIONS,
       inputSchema: fromJsonSchema({
         type: "object",
         properties: {}
-      })
+      }),
+      outputSchema: OUTPUT_SCHEMAS.get_git_status
     },
     async () => {
       try {
@@ -481,8 +705,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
   try {
     const targetRoot = getTargetProjectRoot();
     console.log(`[Project Context OS] Target Project Root: ${targetRoot}`);
-    const authConfigured = Boolean(process.env.CHATGPT_MCP_SECRET && process.env.CHATGPT_MCP_SECRET.trim() !== "");
-    console.log(`[Project Context OS] Authentication: ${authConfigured ? "ENABLED (Bearer token enforced)" : "DISABLED (Local only)"}`);
+    console.log("[Project Context OS] Authentication: No Auth (Streamable HTTP / ChatGPT Web)");
     const { port, url } = await startChatGPTAdapter({ rootDir: targetRoot });
     console.log(`[Project Context OS] ChatGPT MCP Adapter running on ${url} (port ${port})`);
     console.log(`[Project Context OS] Streamable HTTP endpoint: ${url}`);
