@@ -112,10 +112,12 @@ async function run() {
       case "init": {
         const name = flags.name || flags._[1];
         const desc = flags.description;
-        const res = initProjectContext(rootDir, { name, description: desc, force: Boolean(flags.force) });
+        const mode = flags.mode || (flags.adopt ? "adopt" : (flags.create ? "create" : "auto"));
+        const res = initProjectContext(rootDir, { name, description: desc, force: Boolean(flags.force), mode });
         output(res, () => {
           let out = `=== Project Context OS Initialization ===\n`;
-          out += `Project: ${res.project.name}\nRoot: ${res.project.root}\n\n`;
+          out += `Project: ${res.project.name} (${res.project.id})\nRoot: ${res.project.root}\n`;
+          out += `Lifecycle State: ${res.lifecycleState} (Mode: ${res.modeRequested})\n\n`;
           if (res.createdFiles.length > 0) {
             out += `Created ${res.createdFiles.length} file(s):\n`;
             res.createdFiles.forEach((f) => { out += `  + ${f}\n`; });

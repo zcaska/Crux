@@ -13,6 +13,8 @@ import { validateContext } from "./validator.js";
 import { assessContextQuality } from "./quality.js";
 import { checkInvariants } from "./invariants.js";
 import { getGitStatus } from "./git.js";
+import { getGraphifyStatus } from "./graphify.js";
+import { checkConsistency } from "./consistency.js";
 
 /**
  * Runs complete Project Context OS diagnostics.
@@ -128,12 +130,40 @@ export function runDoctor(rootDir) {
     suggestion: quality.health_score >= 80 ? undefined : "Review high-priority attention items via 'project-context attention'.",
   });
 
+  // 9. Graphify Structural Source of Truth (Optional External Integration)
+  const graphifyStatus = getGraphifyStatus(resolvedRoot);
+  const isGraphifyHealthy = graphifyStatus.state !== "INVALID";
+  checks.push({
+    name: "Graphify Structural Integration",
+    passed: isGraphifyHealthy,
+    message: `Graphify State: ${graphifyStatus.state}${graphifyStatus.state === "AVAILABLE" ? ` (${graphifyStatus.nodesCount} nodes, ${graphifyStatus.edgesCount} edges)` : ""}${graphifyStatus.error ? `: ${graphifyStatus.error}` : ""}`,
+    suggestion: graphifyStatus.state === "INVALID"
+      ? "graphify-out/graph.json is corrupted. Re-run 'graphify update .' or remove corrupted files."
+      : graphifyStatus.state === "STALE"
+        ? "Graphify is stale relative to recent commits. Run 'graphify update .' to refresh code relationships."
+        : undefined,
+  });
+
+  // 10. Context Consistency Audit (Git <-> Semantic <-> Structural Alignment)
+  const consistency = checkConsistency(resolvedRoot);
+  checks.push({
+    name: "Context Consistency Audit",
+    passed: !consistency.hasErrors,
+    message: consistency.isConsistent
+      ? "Zero consistency conflicts between Git, semantic context, and structural state."
+      : `Found ${consistency.summary.errors} errors, ${consistency.summary.warnings} warnings, and ${consistency.summary.info} notes.`,
+    suggestion: consistency.hasErrors || consistency.hasWarnings
+      ? consistency.issues.map((i) => `[${i.severity}] ${i.message}`).slice(0, 3).join("; ")
+      : undefined,
+  });
+
   const allPassed = checks.every((c) => c.passed);
 
   return {
     healthy: allPassed,
     score: quality.health_score,
     grade: quality.grade,
+    graphifyState: graphifyStatus.state,
     project: {
       name: cfg.project_name,
       root: resolvedRoot,

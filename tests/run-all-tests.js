@@ -53,6 +53,7 @@ import { runCrossProjectPortabilityTests } from "./cross-project-portability.tes
 import { runModelInteropTests } from "./model-interop.test.js";
 import { runTokenEfficiencyTests } from "./token-efficiency.test.js";
 import { runDecouplingTests } from "./decoupling.test.js";
+import { runAdversarialPhase5Tests } from "./adversarial-phase5.test.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,7 +120,7 @@ async function runTests() {
   assert(decisions.some((d) => d.id === "ADR-002"), "ADR-002 (Official MCP SDK) is present");
 
   // 1.5 Read Changelog
-  const { entries } = readChangelog(rootDir, 100);
+  const { entries } = readChangelog(rootDir, 200);
   assert(entries.length >= 1, "CHANGELOG.md parses semantic change entries");
   assert(entries.some((e) => e.task_id === "TASK-001"), "Changelog includes entry referencing TASK-001");
 
@@ -576,13 +577,18 @@ async function runTests() {
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TEST GROUP 20: Phase 4 Quantitative Token Efficiency & Completeness
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
   await runTokenEfficiencyTests(rootDir, assert);
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
   // TEST GROUP 21: Phase 4 Core Decoupling & Boundary Verification
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
   await runDecouplingTests(rootDir, assert);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEST GROUP 22: Phase 5 Adversarial & Multi-Project Isolation
+  // ─────────────────────────────────────────────────────────────────────────
+  await runAdversarialPhase5Tests(rootDir, assert);
 
   console.log("\n================================================================");
   console.log(`Test Results: ${passed} passed, ${failed} failed`);

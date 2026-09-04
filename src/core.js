@@ -175,6 +175,21 @@ export function readActiveWork(rootDir) {
         const filePath = path.join(activeWorkDir, file);
         const raw = readFileSafe(filePath) || "";
         const meta = parseYamlFrontmatter(raw);
+        let parsedArea = [];
+        if (Array.isArray(meta.working_area)) {
+          parsedArea = meta.working_area;
+        } else if (typeof meta.working_area === "string" && meta.working_area.trim().startsWith("[")) {
+          try {
+            parsedArea = JSON.parse(meta.working_area);
+          } catch {
+            parsedArea = [meta.working_area];
+          }
+        } else if (meta.working_area) {
+          parsedArea = [meta.working_area];
+        } else if (Array.isArray(meta.files)) {
+          parsedArea = meta.files;
+        }
+
         agents.push({
           file,
           agent: meta.agent || path.basename(file, ".md"),
@@ -186,8 +201,8 @@ export function readActiveWork(rootDir) {
           status: meta.status || "READY",
           started_at: meta.started_at || "",
           updated_at: meta.updated_at || "",
-          working_area: meta.working_area || (Array.isArray(meta.files) ? meta.files : []),
-          files: meta.working_area || (Array.isArray(meta.files) ? meta.files : []),
+          working_area: parsedArea,
+          files: parsedArea,
           raw,
         });
       }

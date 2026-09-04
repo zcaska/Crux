@@ -164,6 +164,8 @@ export function listSessions(rootDir, options = {}) {
       started_at: a.started_at,
       last_activity: a.last_activity || a.updated_at,
       updated_at: a.updated_at,
+      working_area: a.working_area || a.files || [],
+      files: a.files || a.working_area || [],
       idleDurationMs,
       idleDurationHours: (idleDurationMs / (1000 * 60 * 60)).toFixed(1),
       isStale,
@@ -202,6 +204,9 @@ export function checkWorkingAreaCollisions(rootDir) {
           const normA = pA.replace(/\\/g, "/").toLowerCase();
           const normB = pB.replace(/\\/g, "/").toLowerCase();
 
+          const prefixA = normA.endsWith("/") ? normA : normA + "/";
+          const prefixB = normB.endsWith("/") ? normB : normB + "/";
+
           if (normA === normB) {
             collisions.push({
               agent_a: a.agent,
@@ -210,7 +215,7 @@ export function checkWorkingAreaCollisions(rootDir) {
               area_b: pB,
               type: "EXACT",
             });
-          } else if (normA.startsWith(normB + "/") || normB.startsWith(normA + "/")) {
+          } else if (normA.startsWith(prefixB) || normB.startsWith(prefixA)) {
             collisions.push({
               agent_a: a.agent,
               agent_b: b.agent,

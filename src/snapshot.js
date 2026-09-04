@@ -1,4 +1,4 @@
-﻿import path from "node:path";
+import path from "node:path";
 /**
  * Project Context OS â€” Deterministic Project Scanner & Hot/Cold Snapshot Generator
  *
@@ -10,6 +10,7 @@
 import { readState, readActiveWork, readTasks, readDecisions, readChangelog, readHandoffs } from "./core.js";
 import { getGitStatus, getGitRecentCommits } from "./git.js";
 import { assertNoSecrets } from "./security.js";
+import { inspectGraphifyStatus, GRAPHIFY_STATES } from "./graphify.js";
 
 /**
  * Generates an AI-optimized context snapshot.
@@ -132,7 +133,7 @@ export function getContextSnapshot(rootDir, options = {}) {
         }
       : null,
 
-    // Section 8: Cold Context Pointers
+    // Section 8: Cold Context Pointers & Structural Availability
     cold_context_pointers: {
       total_completed_tasks: completedCount,
       tasks_archive: ".project-context/TASKS.md",
@@ -140,6 +141,24 @@ export function getContextSnapshot(rootDir, options = {}) {
       changelog_archive: ".project-context/CHANGELOG.md",
       handoffs_archive: ".project-context/handoffs/",
       retrieval_tool: "Use search_project_context(query) or 'npm run context:search <query>' to inspect cold context.",
+      graphify: (() => {
+        try {
+          const g = inspectGraphifyStatus(rootDir);
+          return {
+            state: g.state,
+            is_stale: Boolean(g.isStale),
+            nodes_count: g.nodeCount || 0,
+            edges_count: g.edgeCount || 0,
+          };
+        } catch {
+          return {
+            state: GRAPHIFY_STATES.MISSING,
+            is_stale: false,
+            nodes_count: 0,
+            edges_count: 0,
+          };
+        }
+      })(),
     },
   };
 

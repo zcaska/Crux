@@ -10,7 +10,117 @@ import fs from "node:fs";
 import path from "node:path";
 import { getContextDir } from "./core.js";
 import { assertWithinProject } from "./locator.js";
-import { writeProjectConfig } from "./config.js";
+import { writeProjectConfig, getProjectIdentity } from "./config.js";
+
+export const CONTEXT_LIFECYCLE_STATES = {
+  NEW: "NEW",
+  EXISTING: "EXISTING",
+  INCONSISTENT: "INCONSISTENT",
+  INVALID: "INVALID",
+};
+
+/**
+ * Inspects the current lifecycle and integrity state of .project-context in rootDir.
+ *
+ * @param {string} rootDir
+ * @returns {{
+ *   state: 'NEW' | 'EXISTING' | 'INCONSISTENT' | 'INVALID',
+ *   exists: boolean,
+ *   contextDir: string,
+ *   missingCanonicalFiles: string[],
+ *   missingDirectories: string[],
+ *   error?: string
+ * }}
+ */
+export function inspectContextLifecycle(rootDir) {
+  const resolvedRoot = path.resolve(rootDir);
+  const contextDir = getContextDir(resolvedRoot);
+
+  if (!fs.existsSync(contextDir)) {
+    return {
+      state: CONTEXT_LIFECYCLE_STATES.NEW,
+      exists: false,
+      contextDir,
+      missingCanonicalFiles: [],
+      missingDirectories: [],
+    };
+  }
+
+  let isDir = false;
+  try {
+    isDir = fs.statSync(contextDir).isDirectory();
+  } catch (err) {
+    return {
+      state: CONTEXT_LIFECYCLE_STATES.INVALID,
+      exists: true,
+      contextDir,
+      missingCanonicalFiles: [],
+      missingDirectories: [],
+      error: `Cannot stat .project-context: ${err.message}`,
+    };
+  }
+
+  if (!isDir) {
+    return {
+      state: CONTEXT_LIFECYCLE_STATES.INVALID,
+      exists: true,
+      contextDir,
+      missingCanonicalFiles: [],
+      missingDirectories: [],
+      error: `Path '${contextDir}' exists but is not a directory.`,
+    };
+  }
+
+  // Check required subdirectories
+  const requiredDirs = ["active-work", "handoffs", "schemas"];
+  const missingDirectories = [];
+  for (const d of requiredDirs) {
+    const p = path.join(contextDir, d);
+    if (!fs.existsSync(p) || !fs.statSync(p).isDirectory()) {
+      missingDirectories.push(d);
+    }
+  }
+
+  // Check required canonical files
+  const canonicalFiles = [
+    "config.json",
+    "MANIFEST.md",
+    "STATE.md",
+    "ARCHITECTURE.md",
+    "DECISIONS.md",
+    "ACTIVE-WORK.md",
+    "CHANGELOG.md",
+    "TASKS.md",
+    "active-work/README.md",
+    "handoffs/README.md",
+    "schemas/context-schema.md",
+  ];
+  const missingCanonicalFiles = [];
+  for (const f of canonicalFiles) {
+    const p = path.join(contextDir, f);
+    if (!fs.existsSync(p) || !fs.statSync(p).isFile()) {
+      missingCanonicalFiles.push(f);
+    }
+  }
+
+  if (missingDirectories.length > 0 || missingCanonicalFiles.length > 0) {
+    return {
+      state: CONTEXT_LIFECYCLE_STATES.INCONSISTENT,
+      exists: true,
+      contextDir,
+      missingCanonicalFiles,
+      missingDirectories,
+    };
+  }
+
+  return {
+    state: CONTEXT_LIFECYCLE_STATES.EXISTING,
+    exists: true,
+    contextDir,
+    missingCanonicalFiles: [],
+    missingDirectories: [],
+  };
+}
 
 /**
  * Initializes Project Context OS in the target repository.
@@ -27,6 +137,38 @@ export function initProjectContext(rootDir, options = {}) {
   const baseName = options.name || path.basename(resolvedRoot) || "Project";
   const desc = options.description || `${baseName} software project context`;
   const contextDir = getContextDir(resolvedRoot);
+  const mode = options.mode || "auto"; // "auto" | "create" | "adopt"
+
+  // Check existing context state
+  const contextExists = fs.existsSync(contextDir);
+  if (contextExists && !fs.statSync(contextDir).isDirectory()) {
+    const err = new Error(
+      `ContextIntegrityError: Path '${contextDir}' exists but is not a directory. Cannot initialize or adopt context.`
+    );
+    err.code = "CONTEXT_INVALID_STATE";
+    throw err;
+  }
+
+  // If explicit "create" mode is requested but context already exists and is non-empty, reject
+  if (mode === "create" && contextExists) {
+    const existingEntries = fs.readdirSync(contextDir);
+    if (existingEntries.length > 0 && !options.force) {
+      const err = new Error(
+        `ContextLifecycleError: Project context already exists at '${contextDir}'. Use mode 'adopt' or 'auto' to preserve existing context.`
+      );
+      err.code = "CONTEXT_ALREADY_EXISTS";
+      throw err;
+    }
+  }
+
+  // If explicit "adopt" mode is requested but context does not exist, reject
+  if (mode === "adopt" && !contextExists) {
+    const err = new Error(
+      `ContextLifecycleError: Cannot adopt context. No '.project-context/' directory found at '${resolvedRoot}'. Run 'init' to create new context.`
+    );
+    err.code = "CONTEXT_NOT_FOUND";
+    throw err;
+  }
 
   const createdFiles = [];
   const preservedFiles = [];
@@ -354,15 +496,23 @@ Every autonomous coding agent (Antigravity, Claude, Codex, ChatGPT, Cursor, Kilo
     preservedFiles.push(".vscode/mcp.json");
   }
 
+  const lifecycleState = preservedFiles.length === 0 ? "NEW" : (createdFiles.length === 0 ? "EXISTING" : "RECONCILED");
+
+  const identity = getProjectIdentity(resolvedRoot);
+
   return {
     initialized: true,
     isNew: preservedFiles.length === 0,
+    lifecycleState,
+    modeRequested: mode,
     createdFiles,
     preservedFiles,
     project: {
-      name: baseName,
+      id: identity.id,
+      name: identity.name || baseName,
       root: resolvedRoot,
       contextDir,
+      schema_version: identity.schema_version,
     },
   };
 }

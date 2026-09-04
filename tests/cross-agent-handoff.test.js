@@ -1,4 +1,4 @@
-﻿import { resolveProjectRoot } from "../src/locator.js";
+import { resolveProjectRoot } from "../src/locator.js";
 /**
  * Project Context OS â€” Cross-Agent Handoff & Interoperability Acceptance Test
  *
@@ -220,6 +220,11 @@ export async function runCrossAgentAcceptanceTest() {
     }
     if (endB?.handoff?.filePath && fs.existsSync(endB.handoff.filePath)) {
       fs.unlinkSync(endB.handoff.filePath);
+    }
+    const recoveryHandoffName = adoptRes?.recoveries?.[0]?.recovery_handoff;
+    if (recoveryHandoffName) {
+      const recoveryHandoffPath = path.join(contextDir, "handoffs", recoveryHandoffName);
+      if (fs.existsSync(recoveryHandoffPath)) fs.unlinkSync(recoveryHandoffPath);
     }
     if (initialChangelog) {
       fs.writeFileSync(changelogPath, initialChangelog, "utf-8");

@@ -98,5 +98,36 @@ export function assertWithinProject(candidatePath, rootDir) {
     throw err;
   }
 
+  // Symlink resolution check: if the path or any existing parent is a symlink, verify target stays inside root
+  try {
+    if (fs.existsSync(resolvedCandidate)) {
+      const realCandidate = fs.realpathSync(resolvedCandidate);
+      let realRoot = resolvedRoot;
+      try {
+        if (fs.existsSync(resolvedRoot)) {
+          realRoot = fs.realpathSync(resolvedRoot);
+        }
+      } catch {}
+
+      const normRealRoot = normalizePath(realRoot).toLowerCase();
+      const normRealCandidate = normalizePath(realCandidate).toLowerCase();
+
+      const realIsInside =
+        normRealCandidate === normRealRoot ||
+        normRealCandidate.startsWith(normRealRoot.endsWith("/") ? normRealRoot : normRealRoot + "/");
+
+      if (!realIsInside) {
+        const err = new Error(
+          `PathSecurityViolation: Access denied. Symlink '${candidatePath}' resolves to outside project boundary: '${realCandidate}'.`
+        );
+        err.code = "SYMLINK_ESCAPE_DETECTED";
+        throw err;
+      }
+    }
+  } catch (err) {
+    if (err.code === "SYMLINK_ESCAPE_DETECTED") throw err;
+    // Non-existent targets or file system errors are caught by normal IO operations
+  }
+
   return resolvedCandidate;
 }

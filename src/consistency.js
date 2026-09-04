@@ -12,6 +12,7 @@
 import { getGitStatus } from "./git.js";
 import { readActiveWork, readTasks, readChangelog, readHandoffs } from "./core.js";
 import { listSessions } from "./session.js";
+import { inspectGraphifyStatus, GRAPHIFY_STATES } from "./graphify.js";
 
 /**
  * Runs a comprehensive consistency audit between Git reality and Context OS.
@@ -97,6 +98,26 @@ export function checkConsistency(rootDir, options = {}) {
       });
     }
   }
+
+  // 6. Check: Graphify Structural Freshness & State
+  try {
+    const gStatus = inspectGraphifyStatus(rootDir);
+    if (gStatus.state === GRAPHIFY_STATES.STALE) {
+      issues.push({
+        severity: "INFO",
+        code: "GRAPHIFY_STRUCTURAL_STALE",
+        message: `Graphify structural relationships were built from commit ${gStatus.builtCommit || "unknown"}, but current HEAD is ${gStatus.headCommit || "detached"}.`,
+        suggestion: "Run 'graphify update .' when convenient to refresh AST relationships.",
+      });
+    } else if (gStatus.state === GRAPHIFY_STATES.INVALID) {
+      issues.push({
+        severity: "WARNING",
+        code: "GRAPHIFY_CORRUPTED",
+        message: `Graphify structural data in graphify-out/ is unparseable or corrupted: ${gStatus.error || "invalid schema"}.`,
+        suggestion: "Re-generate or remove corrupted graphify-out/graph.json.",
+      });
+    }
+  } catch {}
 
   const errors = issues.filter((i) => i.severity === "ERROR");
   const warnings = issues.filter((i) => i.severity === "WARNING");

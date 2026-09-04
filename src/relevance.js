@@ -16,6 +16,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { readDecisions, readChangelog, readTasks } from "./core.js";
 import { readProjectConfig } from "./config.js";
+import {
+  inspectGraphifyStatus,
+  getStructuralNeighbors,
+  getDetailedStructuralNeighbors,
+  loadGraphData,
+  getCommunityFiles,
+  GRAPHIFY_STATES,
+} from "./graphify.js";
+import { assertNoSecrets } from "./security.js";
 
 // Stopwords to filter out during tokenization
 const STOPWORDS = new Set([
@@ -250,6 +259,25 @@ export function getRelevantContext(rootDir, options = {}) {
     }
   }
 
+  // 6. Progressive Context Fusion: Enrich candidate files with 1-hop Graphify structural neighbors
+  try {
+    const graphStatus = inspectGraphifyStatus(rootDir);
+    if (graphStatus.state === GRAPHIFY_STATES.AVAILABLE || graphStatus.state === GRAPHIFY_STATES.STALE) {
+      // Seed neighbors from initial suggested files and target files
+      const seedFiles = [...Array.from(suggestedFiles).slice(0, 3), ...targetFiles.slice(0, 3)];
+      for (const sf of seedFiles) {
+        const neighbors = getStructuralNeighbors(rootDir, sf, { limit: 3 });
+        for (const n of neighbors) {
+          suggestedFiles.add(n);
+          if (suggestedFiles.size >= 15) break;
+        }
+        if (suggestedFiles.size >= 15) break;
+      }
+    }
+  } catch {
+    // Graceful degradation: If Graphify inspection fails or graph is corrupted, continue cleanly
+  }
+
   return {
     query_context: {
       task_id,
@@ -259,6 +287,179 @@ export function getRelevantContext(rootDir, options = {}) {
     relevant_decisions: scoredDecisions.filter((d) => d.score > 0).slice(0, limit),
     relevant_changes: scoredChanges.filter((c) => c.score > 0).slice(0, limit),
     relevant_completed_tasks: scoredCompletedTasks.filter((t) => t.score > 0).slice(0, limit),
-    suggested_files: Array.from(suggestedFiles).slice(0, 10),
+    suggested_files: Array.from(suggestedFiles).slice(0, 15),
   };
 }
+
+/**
+ * Executes Dual-Source Progressive Context Fusion:
+ * Composes Crux semantic context, Graphify structural context, and Git state
+ * into a single bounded, deterministic, safe FusedContext structure.
+ *
+ * @param {string} rootDir - Target project root
+ * @param {object} [options={}]
+ * @param {string} [options.task_id] - Optional target task ID (e.g. TASK-002)
+ * @param {string} [options.query] - Optional free-text topic query
+ * @param {string[]} [options.files] - Optional list of files being inspected
+ * @param {number} [options.limit=5] - Semantic item limit (default 5)
+ * @param {number} [options.maxNeighbors=5] - Max structural neighbors (default 5)
+ * @param {number} [options.maxCommunityFiles=5] - Max community cluster files (default 5)
+ * @param {number} [options.maxSuggestedFiles=15] - Hard cap on combined suggested files (default 15)
+ * @returns {{
+ *   project_id: string,
+ *   project_name: string,
+ *   query_context: { task_id?: string, query?: string, files?: string[] },
+ *   semantic_context: {
+ *     decisions: Array<{ id: string, title: string, status: string, score: number, reason: string }>,
+ *     changes: Array<{ date: string, task_id: string, summary: string, score: number, matched_files: string[] }>,
+ *     completed_tasks: Array<{ id: string, title: string, score: number }>
+ *   },
+ *   structural_context: {
+ *     state: 'AVAILABLE' | 'STALE' | 'MISSING' | 'INVALID',
+ *     is_stale: boolean,
+ *     built_commit: string | null,
+ *     head_commit: string | null,
+ *     neighbors: Array<{ file: string, relation: 'caller' | 'dependency', from: string }>,
+ *     community?: { id: number | string, name?: string, files: string[] },
+ *     error?: string
+ *   },
+ *   suggested_files: string[]
+ * }}
+ */
+export function getFusedContext(rootDir, options = {}) {
+  const {
+    task_id,
+    query = "",
+    files = [],
+    limit = 5,
+    maxNeighbors = 5,
+    maxCommunityFiles = 5,
+    maxSuggestedFiles = 15,
+  } = options;
+
+  // 1. Resolve project root and read identity
+  const projCfg = readProjectConfig(rootDir);
+  const projectId = projCfg.project_id || path.basename(path.resolve(rootDir)) || "project";
+  const projectName = projCfg.project_name || path.basename(path.resolve(rootDir)) || "Project";
+
+  // 2. Fetch semantic context using deterministic relevance engine
+  const baseSemantic = getRelevantContext(rootDir, {
+    task_id,
+    query,
+    files,
+    limit,
+  });
+
+  // 3. Inspect Graphify structural state
+  let graphStatus;
+  try {
+    graphStatus = inspectGraphifyStatus(rootDir);
+  } catch (err) {
+    graphStatus = {
+      state: GRAPHIFY_STATES.INVALID,
+      isStale: false,
+      builtCommit: null,
+      headCommit: null,
+      error: err.message,
+    };
+  }
+
+  // 4. Extract 1-hop structural relationships and community cluster if AVAILABLE or STALE
+  const structuralNeighbors = [];
+  let primaryCommunity = undefined;
+  const combinedFiles = new Set(baseSemantic.suggested_files);
+
+  if (graphStatus.state === GRAPHIFY_STATES.AVAILABLE || graphStatus.state === GRAPHIFY_STATES.STALE) {
+    try {
+      const graphData = loadGraphData(rootDir);
+      // Determine seed files from explicit files or top semantic suggestions
+      const seedFiles = files.length > 0
+        ? files.slice(0, 3)
+        : baseSemantic.suggested_files.slice(0, 3);
+
+      const seenNeighborFiles = new Set();
+
+      for (const seed of seedFiles) {
+        if (!seed || typeof seed !== "string") continue;
+        const normSeed = seed.replace(/\\/g, "/");
+
+        // Extract detailed neighbors with relation provenance
+        const neighbors = getDetailedStructuralNeighbors(rootDir, normSeed, {
+          limit: maxNeighbors,
+          includeCallers: true,
+          includeDependencies: true,
+        });
+
+        for (const n of neighbors) {
+          if (!seenNeighborFiles.has(n.file)) {
+            seenNeighborFiles.add(n.file);
+            structuralNeighbors.push(n);
+            combinedFiles.add(n.file);
+          }
+          if (structuralNeighbors.length >= maxNeighbors) break;
+        }
+
+        // Identify community cluster for first seed node if available
+        if (!primaryCommunity && graphData && graphData.fileNodeMap) {
+          const normSeedLower = normSeed.toLowerCase();
+          for (const [fPath, nodes] of graphData.fileNodeMap.entries()) {
+            const fLower = fPath.toLowerCase();
+            if (fLower === normSeedLower || fLower.endsWith(`/${normSeedLower}`) || normSeedLower.endsWith(`/${fLower}`)) {
+              const matchedNode = nodes[0];
+              if (matchedNode && matchedNode.community !== undefined) {
+                const commFiles = getCommunityFiles(rootDir, matchedNode.community);
+                primaryCommunity = {
+                  id: matchedNode.community,
+                  name: matchedNode.community_name || undefined,
+                  files: commFiles.slice(0, maxCommunityFiles),
+                };
+                for (const cf of primaryCommunity.files) {
+                  combinedFiles.add(cf);
+                }
+              }
+              break;
+            }
+          }
+        }
+
+        if (structuralNeighbors.length >= maxNeighbors) break;
+      }
+    } catch {
+      // Fail closed gracefully on graph extraction errors
+    }
+  }
+
+  // 5. Construct final FusedContext object
+  const fused = {
+    project_id: projectId,
+    project_name: projectName,
+    query_context: {
+      task_id: task_id || undefined,
+      query: query || undefined,
+      files: files.length > 0 ? files : undefined,
+    },
+    semantic_context: {
+      decisions: baseSemantic.relevant_decisions.slice(0, limit),
+      changes: baseSemantic.relevant_changes.slice(0, limit),
+      completed_tasks: baseSemantic.relevant_completed_tasks.slice(0, limit),
+    },
+    structural_context: {
+      state: graphStatus.state,
+      is_stale: Boolean(graphStatus.isStale),
+      built_commit: graphStatus.builtCommit || null,
+      head_commit: graphStatus.headCommit || null,
+      neighbors: structuralNeighbors.slice(0, maxNeighbors),
+      community: primaryCommunity,
+      error: graphStatus.error || undefined,
+    },
+    suggested_files: Array.from(combinedFiles).slice(0, maxSuggestedFiles),
+  };
+
+  // 6. Security verification: audit against credentials or secrets
+  assertNoSecrets(fused, "getFusedContext");
+
+  return fused;
+}
+
+// Alias for getFusedContext
+export const fuseContext = getFusedContext;
