@@ -58,9 +58,9 @@ import { assessContextQuality } from "../src/quality.js";
 import { getRelevantContext } from "../src/relevance.js";
 import { checkContextDrift } from "../src/drift.js";
 import { checkInvariants } from "../src/invariants.js";
-import { resolveProjectRoot } from "../src/locator.js";
+import { resolveProjectRoot, assertWithinProject } from "../src/locator.js";
 import { initProjectContext } from "../src/init.js";
-import { runDoctor } from "../src/doctor.js";
+import { runDoctor, getProjectDiagnostics } from "../src/doctor.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -152,6 +152,42 @@ async function run() {
           return out;
         });
         if (!doc.healthy) process.exitCode = 1;
+        break;
+      }
+
+      case "diagnostics": {
+        const diag = getProjectDiagnostics(rootDir);
+        const outputPath = flags.output;
+        if (outputPath) {
+          const resolvedOut = path.resolve(rootDir, outputPath);
+          assertWithinProject(resolvedOut, rootDir);
+          if (fs.existsSync(resolvedOut) && !flags.force) {
+            throw new Error(`Output file already exists at '${resolvedOut}'. Use --force to overwrite.`);
+          }
+          fs.writeFileSync(resolvedOut, JSON.stringify(diag, null, 2) + "\n", "utf-8");
+        }
+
+        output(diag, () => {
+          let out = `=== Project Context OS — Unified Diagnostics ===\n`;
+          out += `Project: ${diag.project.name} (${diag.project.id})\n`;
+          out += `Root: ${diag.project.root}\n`;
+          out += `Lifecycle: ${diag.lifecycle.state} (Valid: ${diag.lifecycle.is_valid})\n`;
+          out += `Health: ${diag.health.score}% [Grade: ${diag.health.grade}] (Healthy: ${diag.health.healthy})\n`;
+          out += `Sessions: ${diag.sessions.total} total (${diag.sessions.active_count} active, ${diag.sessions.stale_count} stale, ${diag.sessions.completed_count} completed)\n`;
+          out += `Collisions: ${diag.sessions.collisions.count} detected (Has collisions: ${diag.sessions.collisions.has_collisions})\n`;
+          out += `Structural (Graphify): ${diag.structural.state} (${diag.structural.nodes_count} nodes, ${diag.structural.edges_count} edges, stale: ${diag.structural.is_stale})\n`;
+          out += `Git: ${diag.git.branch} (Clean: ${diag.git.is_clean}, ${diag.git.staged_count} staged, ${diag.git.unstaged_count} unstaged, ${diag.git.untracked_count} untracked)\n`;
+          out += `Consistency: ${diag.consistency.is_consistent ? "CONSISTENT" : "INCONSISTENT"} (${diag.consistency.errors_count} errors, ${diag.consistency.warnings_count} warnings, ${diag.consistency.info_count} info)\n`;
+          out += `Reconciliation Recommended: ${diag.reconciliation.reconcile_recommended ? "YES" : "NO"}\n`;
+          if (diag.reconciliation.reasons.length > 0) {
+            out += `  Reasons:\n`;
+            diag.reconciliation.reasons.forEach((r) => { out += `    - ${r}\n`; });
+          }
+          if (outputPath) {
+            out += `\n✓ Diagnostics written to '${outputPath}'\n`;
+          }
+          return out;
+        });
         break;
       }
 
@@ -693,6 +729,7 @@ Universalization & Lifecycle Commands:
   init-client [vscode|cursor|claude]   Scaffold client MCP discovery config
 
 Context Intelligence & Observability (Phase 3):
+  diagnostics [--output <f>] [--json]  Unified machine-readable operational diagnostics export
   health [--json]                      Assess 6-pillar Context Health & freshness
   drift [--json]                       Audit Git ↔ Context OS semantic drift
   relevance <query/task> [--json]      Calculate task-tailored Warm Context rankings

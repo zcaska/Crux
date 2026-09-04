@@ -33,6 +33,7 @@ export function assessContextQuality(rootDir) {
   const now = Date.now();
 
   const state = readState(rootDir);
+  const stateMeta = state.meta || state.data || {};
   const { tasks } = readTasks(rootDir);
   const { entries: changelog } = readChangelog(rootDir, 20);
   const { handoffs } = readHandoffs(rootDir, 10);
@@ -79,8 +80,8 @@ export function assessContextQuality(rootDir) {
   }
 
   // Check state update freshness
-  if (state.meta.last_context_update) {
-    const updateTime = new Date(state.meta.last_context_update).getTime();
+  if (stateMeta.last_context_update) {
+    const updateTime = new Date(stateMeta.last_context_update).getTime();
     const daysSinceUpdate = (now - updateTime) / (1000 * 60 * 60 * 24);
     if (daysSinceUpdate > 7) {
       freshnessScore -= 15;
@@ -97,7 +98,7 @@ export function assessContextQuality(rootDir) {
   // ───────────────────────────────────────────────────────────────────────────
   // 2. COMPLETENESS
   // ───────────────────────────────────────────────────────────────────────────
-  if (!state.meta.current_objective || state.meta.current_objective.trim().length < 5) {
+  if (!stateMeta.current_objective || stateMeta.current_objective.trim().length < 5) {
     completenessScore -= 15;
     issues.push({
       pillar: "Completeness",
@@ -143,7 +144,7 @@ export function assessContextQuality(rootDir) {
 
   // Git uncommitted changes vs completed state
   const modifiedCount = (gitStatus.staged || []).length + (gitStatus.unstaged || []).length;
-  if (modifiedCount > 0 && (sessionInfo.active_count ?? 0) === 0 && state.meta.current_status === "VERIFIED") {
+  if (modifiedCount > 0 && (sessionInfo.active_count ?? 0) === 0 && stateMeta.current_status === "VERIFIED") {
     consistencyScore -= 15;
     issues.push({
       pillar: "Consistency",

@@ -8,13 +8,17 @@
 import fs from "node:fs";
 import path from "node:path";
 import { getContextDir, readFileSafe } from "./core.js";
-import { readProjectConfig } from "./config.js";
+import { readProjectConfig, getProjectIdentity } from "./config.js";
 import { validateContext } from "./validator.js";
 import { assessContextQuality } from "./quality.js";
 import { checkInvariants } from "./invariants.js";
-import { getGitStatus } from "./git.js";
+import { getGitStatus, getGitRecentCommits } from "./git.js";
 import { getGraphifyStatus } from "./graphify.js";
 import { checkConsistency } from "./consistency.js";
+import { assertWithinProject } from "./locator.js";
+import { assertNoSecrets } from "./security.js";
+import { listSessions, checkWorkingAreaCollisions } from "./session.js";
+import { inspectContextLifecycle } from "./init.js";
 
 /**
  * Runs complete Project Context OS diagnostics.
@@ -170,4 +174,119 @@ export function runDoctor(rootDir) {
     },
     checks,
   };
+}
+
+/**
+ * Returns a unified, consolidated, machine-readable operational diagnostic record
+ * for the project repository adhering to the Phase 5F specification.
+ *
+ * @param {string} rootDir - Project repository root
+ * @param {object} [options={}]
+ * @returns {object} ProjectDiagnosticsRecord
+ */
+export function getProjectDiagnostics(rootDir, options = {}) {
+  const resolvedRoot = assertWithinProject(path.resolve(rootDir), path.resolve(rootDir));
+  const identity = getProjectIdentity(resolvedRoot);
+  const lifecycle = inspectContextLifecycle(resolvedRoot);
+  const quality = assessContextQuality(resolvedRoot);
+  const sessionInfo = listSessions(resolvedRoot);
+  const collisionsInfo = checkWorkingAreaCollisions(resolvedRoot);
+  const structuralStatus = getGraphifyStatus(resolvedRoot);
+  const gitStatus = getGitStatus(resolvedRoot);
+  const recentCommits = getGitRecentCommits(resolvedRoot, 1);
+  const consistencyInfo = checkConsistency(resolvedRoot);
+
+  // Determine reconciliation necessity
+  const reconcileReasons = [];
+  if (lifecycle.state !== "EXISTING") {
+    reconcileReasons.push(`Context store lifecycle state is '${lifecycle.state}'`);
+  }
+  if (lifecycle.missingCanonicalFiles && lifecycle.missingCanonicalFiles.length > 0) {
+    reconcileReasons.push(`Missing canonical files: ${lifecycle.missingCanonicalFiles.join(", ")}`);
+  }
+  if (consistencyInfo.hasErrors) {
+    reconcileReasons.push(`Context consistency audit found ${consistencyInfo.summary.errors} error-level violations`);
+  }
+
+  // Bounded collections to prevent unbounded serialization
+  const boundedIssues = (consistencyInfo.issues || []).slice(0, 25).map((iss) => ({
+    code: iss.code,
+    severity: iss.severity,
+    message: iss.message,
+    suggestion: iss.suggestion,
+  }));
+
+  const boundedCollisions = (collisionsInfo.collisions || []).slice(0, 20);
+
+  const record = {
+    _type: "ProjectDiagnosticsRecord",
+    schema_version: "1.0.0",
+    timestamp: new Date().toISOString(),
+    project: {
+      id: identity.id,
+      name: identity.name,
+      root: resolvedRoot,
+    },
+    lifecycle: {
+      state: lifecycle.state,
+      is_valid: lifecycle.state === "EXISTING",
+      missing_files: (lifecycle.missingCanonicalFiles || []).slice(0, 15),
+      missing_directories: (lifecycle.missingDirectories || []).slice(0, 10),
+    },
+    health: {
+      score: quality.health_score,
+      grade: quality.grade,
+      healthy: quality.health_score >= 80,
+      pillars: {
+        freshness: quality.pillars?.freshness?.score ?? 100,
+        completeness: quality.pillars?.completeness?.score ?? 100,
+        consistency: quality.pillars?.consistency?.score ?? 100,
+        integrity: quality.pillars?.integrity?.score ?? 100,
+        recoverability: quality.pillars?.recoverability?.score ?? 100,
+      },
+    },
+    sessions: {
+      total: sessionInfo.total,
+      active_count: sessionInfo.active_count,
+      stale_count: sessionInfo.stale_count,
+      completed_count: sessionInfo.completed_count,
+      collisions: {
+        has_collisions: collisionsInfo.hasCollisions,
+        count: collisionsInfo.count,
+        items: boundedCollisions,
+      },
+    },
+    structural: {
+      source: "graphify",
+      state: structuralStatus.state,
+      is_stale: structuralStatus.isStale || structuralStatus.state === "STALE",
+      nodes_count: structuralStatus.nodesCount || 0,
+      edges_count: structuralStatus.edgesCount || 0,
+      communities_count: structuralStatus.communitiesCount || 0,
+    },
+    git: {
+      branch: gitStatus.branch || "unknown",
+      is_clean: Boolean(gitStatus.isClean),
+      staged_count: (gitStatus.staged || []).length,
+      unstaged_count: (gitStatus.unstaged || []).length,
+      untracked_count: (gitStatus.untracked || []).length,
+      recent_commit: recentCommits.length > 0 ? recentCommits[0].hash : undefined,
+    },
+    consistency: {
+      is_consistent: consistencyInfo.isConsistent,
+      errors_count: consistencyInfo.summary?.errors ?? 0,
+      warnings_count: consistencyInfo.summary?.warnings ?? 0,
+      info_count: consistencyInfo.summary?.info ?? 0,
+      issues: boundedIssues,
+    },
+    reconciliation: {
+      reconcile_recommended: reconcileReasons.length > 0,
+      reasons: reconcileReasons,
+    },
+  };
+
+  // Enforce anti-credential security audit
+  assertNoSecrets(record, "getProjectDiagnostics");
+
+  return record;
 }

@@ -138,7 +138,7 @@ export function heartbeatSession(rootDir, agent, updates = {}) {
 }
 
 /**
- * Lists all registered agent sessions and calculates staleness.
+ * Lists all registered agent sessions and calculates staleness and granular liveness.
  * @param {string} rootDir
  * @param {object} [options={}]
  * @param {number} [options.staleThresholdMs=86400000]
@@ -148,10 +148,28 @@ export function listSessions(rootDir, options = {}) {
   const { agents } = readActiveWork(rootDir);
   const now = Date.now();
 
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const SEVENTY_TWO_HOURS_MS = 72 * 60 * 60 * 1000;
+
   const sessions = agents.map((a) => {
     const lastActivityTime = a.last_activity ? new Date(a.last_activity).getTime() : new Date(a.updated_at).getTime();
     const idleDurationMs = Math.max(0, now - lastActivityTime);
     const isStale = a.status === "IN_PROGRESS" && idleDurationMs > staleThreshold;
+
+    let liveness = "UNKNOWN";
+    if (a.status === "COMPLETED") {
+      liveness = "COMPLETED";
+    } else if (a.status === "IN_PROGRESS") {
+      if (idleDurationMs <= ONE_HOUR_MS) {
+        liveness = "ACTIVE";
+      } else if (idleDurationMs <= staleThreshold) {
+        liveness = "ACTIVE_BUT_IDLE";
+      } else if (idleDurationMs <= SEVENTY_TWO_HOURS_MS) {
+        liveness = "STALE";
+      } else {
+        liveness = "ABANDONED";
+      }
+    }
 
     return {
       agent: a.agent,
@@ -161,6 +179,7 @@ export function listSessions(rootDir, options = {}) {
       active_task: a.active_task,
       task_title: a.task_title,
       status: a.status,
+      liveness,
       started_at: a.started_at,
       last_activity: a.last_activity || a.updated_at,
       updated_at: a.updated_at,
@@ -185,7 +204,7 @@ export function listSessions(rootDir, options = {}) {
 /**
  * Detects working area collisions between concurrent active sessions.
  * @param {string} rootDir
- * @returns {{ hasCollisions: boolean, collisions: Array<{ agent_a: string, agent_b: string, area_a: string, area_b: string, type: 'EXACT'|'OVERLAP' }> }}
+ * @returns {{ hasCollisions: boolean, count: number, collisions: Array<{ agent_a: string, agent_b: string, task_a: string, task_b: string, area_a: string, area_b: string, type: 'EXACT'|'OVERLAP', subtype: 'EXACT'|'CONTAINMENT_DIR_FILE'|'CONTAINMENT_DIR_DIR', recommendation: string }> }}
  */
 export function checkWorkingAreaCollisions(rootDir) {
   const { agents } = readActiveWork(rootDir);
@@ -211,17 +230,37 @@ export function checkWorkingAreaCollisions(rootDir) {
             collisions.push({
               agent_a: a.agent,
               agent_b: b.agent,
+              task_a: a.active_task || "NONE",
+              task_b: b.active_task || "NONE",
               area_a: pA,
               area_b: pB,
               type: "EXACT",
+              subtype: "EXACT",
+              recommendation: `Exact collision on '${pA}'. Agents '${a.agent}' and '${b.agent}' should coordinate sequentially via handoffs or partition file responsibilities.`,
             });
           } else if (normA.startsWith(prefixB) || normB.startsWith(prefixA)) {
+            // Determine whether containment is dir->file or dir->dir
+            const aIsParent = normB.startsWith(prefixA);
+            const parentArea = aIsParent ? pA : pB;
+            const childArea = aIsParent ? pB : pA;
+            const parentNorm = aIsParent ? normA : normB;
+            const childNorm = aIsParent ? normB : normA;
+
+            const isChildFile = path.extname(childNorm).length > 0 || !childArea.endsWith("/");
+            const isParentDir = parentArea.endsWith("/") || path.extname(parentNorm).length === 0;
+
+            const subtype = (isParentDir && isChildFile) ? "CONTAINMENT_DIR_FILE" : "CONTAINMENT_DIR_DIR";
+
             collisions.push({
               agent_a: a.agent,
               agent_b: b.agent,
+              task_a: a.active_task || "NONE",
+              task_b: b.active_task || "NONE",
               area_a: pA,
               area_b: pB,
               type: "OVERLAP",
+              subtype,
+              recommendation: `Hierarchical scope overlap: '${parentArea}' contains '${childArea}'. Recommend excluding '${childArea}' from the parent directory scope or sequencing tasks.`,
             });
           }
         }

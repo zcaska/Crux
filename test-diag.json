@@ -1,0 +1,75 @@
+{
+  "_type": "ProjectDiagnosticsRecord",
+  "schema_version": "1.0.0",
+  "timestamp": "2026-09-04T13:15:15.472Z",
+  "project": {
+    "id": "project-context-os",
+    "name": "project-context-os",
+    "root": "C:\\Users\\AGP\\Documents\\Projects\\project-context-os"
+  },
+  "lifecycle": {
+    "state": "NEW",
+    "is_valid": false,
+    "missing_files": [],
+    "missing_directories": []
+  },
+  "health": {
+    "score": 96,
+    "grade": "A",
+    "healthy": true,
+    "pillars": {
+      "freshness": 100,
+      "completeness": 100,
+      "consistency": 100,
+      "integrity": 100,
+      "recoverability": 100
+    }
+  },
+  "sessions": {
+    "total": 0,
+    "active_count": 0,
+    "stale_count": 0,
+    "completed_count": 0,
+    "collisions": {
+      "has_collisions": false,
+      "count": 0,
+      "items": []
+    }
+  },
+  "structural": {
+    "source": "graphify",
+    "state": "MISSING",
+    "is_stale": false,
+    "nodes_count": 0,
+    "edges_count": 0,
+    "communities_count": 0
+  },
+  "git": {
+    "branch": "main",
+    "is_clean": false,
+    "staged_count": 1,
+    "unstaged_count": 4,
+    "untracked_count": 2,
+    "recent_commit": "7ecc2b0"
+  },
+  "consistency": {
+    "is_consistent": true,
+    "errors_count": 0,
+    "warnings_count": 0,
+    "info_count": 1,
+    "issues": [
+      {
+        "code": "SIGNIFICANT_MODIFICATIONS_UNRECORDED",
+        "severity": "INFO",
+        "message": "Working tree has 5 modified files, but recent CHANGELOG entries do not reflect current modifications.",
+        "suggestion": "Record a semantic summary in .project-context/CHANGELOG.md upon completing this milestone."
+      }
+    ]
+  },
+  "reconciliation": {
+    "reconcile_recommended": true,
+    "reasons": [
+      "Context store lifecycle state is 'NEW'"
+    ]
+  }
+}

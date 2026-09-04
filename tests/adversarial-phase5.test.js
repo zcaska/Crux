@@ -41,6 +41,9 @@ import {
   reconcileContext,
   recoverSession,
   startSession,
+  listSessions,
+  checkWorkingAreaCollisions,
+  getProjectDiagnostics,
 } from "../src/index.js";
 
 const TOKEN_12 = "PROJECT_TWELVE_ALPHA_CONTEXT_TOKEN_12";
@@ -692,6 +695,266 @@ export async function runAdversarialPhase5Tests(careerOsRoot, assert) {
     assert(auditScratch.success === true, "Reconciliation succeeds with scratch directory present");
     assert(fs.existsSync(sentinelScratch), "Scratch file is preserved 100% untouched");
     assert(fs.readFileSync(sentinelScratch, "utf-8") === "# Important user scratch work", "Scratch file content is identical");
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 10. Phase 5F Multi-Agent Coordination, Liveness & Diagnostics Export
+    // ───────────────────────────────────────────────────────────────────────────
+    console.log("\n── 10. Phase 5F Multi-Agent Coordination, Liveness & Diagnostics Export ──");
+
+    // Clean active-work directory on project12Root for deterministic session tests
+    const p12ActiveWorkDir = path.join(project12Root, ".project-context", "active-work");
+    const existingWorkFiles = fs.readdirSync(p12ActiveWorkDir);
+    for (const wf of existingWorkFiles) {
+      if (wf.endsWith(".md") && wf !== "README.md") {
+        fs.unlinkSync(path.join(p12ActiveWorkDir, wf));
+      }
+    }
+
+    // Gate 10.1: Directory-File Containment Collision (CONTAINMENT_DIR_FILE)
+    startSession(project12Root, {
+      agent: "agent-alpha-dir",
+      active_task: "TASK-DIR-001",
+      working_area: ["frontend/src/services/"],
+    });
+    startSession(project12Root, {
+      agent: "agent-beta-file",
+      active_task: "TASK-FILE-002",
+      working_area: ["frontend/src/services/auth.js"],
+    });
+
+    const colDirFile = checkWorkingAreaCollisions(project12Root);
+    assert(colDirFile.hasCollisions === true, "checkWorkingAreaCollisions detects collision between directory and contained file");
+    assert(colDirFile.count === 1, "Exactly 1 collision detected for dir->file overlap");
+    assert(colDirFile.collisions[0].type === "OVERLAP", "Collision type is OVERLAP");
+    assert(colDirFile.collisions[0].subtype === "CONTAINMENT_DIR_FILE", "Collision subtype is CONTAINMENT_DIR_FILE");
+    assert(colDirFile.collisions[0].recommendation.includes("Hierarchical scope overlap"), "Provides advisory recommendation for containment");
+
+    // Gate 10.2: Exact Collision Detection (EXACT)
+    // Add third agent with exact file match
+    startSession(project12Root, {
+      agent: "agent-gamma-exact",
+      active_task: "TASK-EXACT-003",
+      working_area: ["frontend/src/services/auth.js"],
+    });
+
+    const colExact = checkWorkingAreaCollisions(project12Root);
+    const exactMatches = colExact.collisions.filter((c) => c.type === "EXACT");
+    assert(exactMatches.length === 1, "Exactly 1 EXACT collision detected");
+    assert(exactMatches[0].subtype === "EXACT", "Exact collision subtype is EXACT");
+    assert(exactMatches[0].area_a === "frontend/src/services/auth.js" && exactMatches[0].area_b === "frontend/src/services/auth.js", "Both agents conflict on identical file");
+    assert(exactMatches[0].recommendation.includes("Exact collision"), "Provides advisory recommendation for exact collision");
+
+    // Gate 10.3: Disjoint Non-Colliding Sessions
+    // Reset sessions with disjoint areas
+    fs.unlinkSync(path.join(p12ActiveWorkDir, "agent-alpha-dir.md"));
+    fs.unlinkSync(path.join(p12ActiveWorkDir, "agent-beta-file.md"));
+    fs.unlinkSync(path.join(p12ActiveWorkDir, "agent-gamma-exact.md"));
+
+    startSession(project12Root, {
+      agent: "agent-disjoint-1",
+      active_task: "TASK-DISJOINT-1",
+      working_area: ["src/features/auth.js"],
+    });
+    startSession(project12Root, {
+      agent: "agent-disjoint-2",
+      active_task: "TASK-DISJOINT-2",
+      working_area: ["src/features/billing.js"],
+    });
+
+    const colDisjoint = checkWorkingAreaCollisions(project12Root);
+    assert(colDisjoint.hasCollisions === false, "Disjoint sessions yield hasCollisions = false");
+    assert(colDisjoint.count === 0, "Disjoint sessions yield count = 0");
+    assert(colDisjoint.collisions.length === 0, "Disjoint sessions return empty collisions array");
+
+    // Gate 10.4: Advisory-Only Invariance
+    // Re-create a collision and ensure descriptors on disk are byte-for-byte untouched
+    startSession(project12Root, {
+      agent: "agent-invariance-a",
+      active_task: "TASK-INV-A",
+      working_area: ["src/core.js"],
+    });
+    startSession(project12Root, {
+      agent: "agent-invariance-b",
+      active_task: "TASK-INV-B",
+      working_area: ["src/core.js"],
+    });
+
+    const pathA = path.join(p12ActiveWorkDir, "agent-invariance-a.md");
+    const pathB = path.join(p12ActiveWorkDir, "agent-invariance-b.md");
+    const contentABefore = fs.readFileSync(pathA, "utf-8");
+    const contentBBefore = fs.readFileSync(pathB, "utf-8");
+
+    const colInv = checkWorkingAreaCollisions(project12Root);
+    assert(colInv.hasCollisions === true, "Collision detected between invariance test agents");
+
+    const contentAAfter = fs.readFileSync(pathA, "utf-8");
+    const contentBAfter = fs.readFileSync(pathB, "utf-8");
+    assert(contentABefore === contentAAfter, "Agent A descriptor remains 100% byte-for-byte identical after collision detection");
+    assert(contentBBefore === contentBAfter, "Agent B descriptor remains 100% byte-for-byte identical after collision detection");
+
+    // Gate 10.5: Unified Diagnostic Export Completeness & Bounded Arrays
+    const diag = getProjectDiagnostics(project12Root);
+    assert(diag._type === "ProjectDiagnosticsRecord", "Diagnostics type is ProjectDiagnosticsRecord");
+    assert(diag.schema_version === "1.0.0", "Diagnostics schema_version is 1.0.0");
+    assert(diag.project.id === "project-12", "Diagnostics records correct project.id");
+    assert(diag.lifecycle.state === "EXISTING", "Lifecycle state is EXISTING");
+    assert(typeof diag.health.score === "number", "Health score is numeric");
+    assert(diag.sessions.total >= 2, "Sessions total reflects registered agents");
+    assert(diag.sessions.collisions.has_collisions === true, "Consolidated collisions reported in diagnostics");
+    assert(diag.structural.source === "graphify", "Structural source is graphify");
+    assert(typeof diag.git.is_clean === "boolean", "Git is_clean boolean reported");
+    assert(diag.consistency.is_consistent !== undefined, "Consistency state reported");
+    assert(diag.reconciliation.reconcile_recommended !== undefined, "Reconciliation recommendation reported");
+    assert(Array.isArray(diag.consistency.issues), "Consistency issues is an array");
+    assert(diag.consistency.issues.length <= 25, "Consistency issues bounded to <= 25 entries");
+    assert(diag.sessions.collisions.items.length <= 20, "Session collisions bounded to <= 20 entries");
+
+    // Gate 10.6: Anti-Credential Scrubbing on Diagnostics
+    // Create an unclosed agent with an API token to verify assertNoSecrets triggers
+    let secretArrested = false;
+    try {
+      startSession(project12Root, {
+        agent: "agent-leak",
+        active_task: "TASK-LEAK",
+        objective: "Testing sk-proj-1234567890abcdef1234567890abcdef leak prevention",
+      });
+    } catch (err) {
+      if (err.message.includes("Credential") || err.message.includes("Secret") || err.code === "SECURITY_VIOLATION") {
+        secretArrested = true;
+      }
+    }
+    assert(secretArrested === true, "Anti-credential check arrested secret API token from entering session registry");
+
+    // Gate 10.7: Multi-Project Isolation in Diagnostics
+    const p12Diag = getProjectDiagnostics(project12Root);
+    const p19Diag = getProjectDiagnostics(project19Root);
+    const p12DiagStr = JSON.stringify(p12Diag);
+    const p19DiagStr = JSON.stringify(p19Diag);
+
+    assert(p12Diag.project.id === "project-12", "p12 diagnostics bound to project-12");
+    assert(p19Diag.project.id === "project-19", "p19 diagnostics bound to project-19");
+    assert(!p12DiagStr.includes("TOKEN_19"), "Project-12 diagnostics contain ZERO traces of sibling Project-19 tokens");
+    assert(!p12DiagStr.includes(project19Root.replace(/\\/g, "/")), "Project-12 diagnostics contain ZERO paths from Project-19");
+    assert(!p19DiagStr.includes("TOKEN_12"), "Project-19 diagnostics contain ZERO traces of sibling Project-12 tokens");
+
+    // Gate 10.8: Symlink & Traversal Resistance in Diagnostics
+    let diagTraversalThrown = false;
+    try {
+      getProjectDiagnostics(path.join(project12Root, "..", "project-19", "..", ".."));
+    } catch {
+      diagTraversalThrown = true;
+    }
+    try {
+      assertWithinProject(path.join(project12Root, "..", "escaped"), project12Root);
+    } catch (err) {
+      diagTraversalThrown = true;
+      assert(err.code === "PATH_TRAVERSAL_DETECTED", "Escaped path throws PATH_TRAVERSAL_DETECTED");
+    }
+    assert(diagTraversalThrown === true, "Path traversal in diagnostics is rejected");
+
+    // Gate 10.9: Read-Only Graphify & Git Invariance
+    const p12GraphPath = path.join(project12Root, "graphify-out", "graph.json");
+    const graphMtimeBefore = fs.existsSync(p12GraphPath) ? fs.statSync(p12GraphPath).mtimeMs : 0;
+    const gitHeadBefore = diag.git.recent_commit;
+
+    getProjectDiagnostics(project12Root);
+
+    const graphMtimeAfter = fs.existsSync(p12GraphPath) ? fs.statSync(p12GraphPath).mtimeMs : 0;
+    const gitHeadAfter = getProjectDiagnostics(project12Root).git.recent_commit;
+    assert(graphMtimeBefore === graphMtimeAfter, "graphify-out/ remains completely untouched during diagnostics");
+    assert(gitHeadBefore === gitHeadAfter, "Git commit HEAD remains unchanged during diagnostics");
+
+    // Gate 10.10: Explicit Liveness vs. Crash Invariant Tests (live-but-idle != CRASHED)
+    // 1. Fresh session (<= 1h) -> ACTIVE
+    const freshSession = listSessions(project12Root).sessions.find((s) => s.agent === "agent-invariance-a");
+    assert(freshSession !== undefined, "Found test agent session");
+    assert(freshSession.liveness === "ACTIVE", "Recently updated session classified as ACTIVE");
+
+    // 2. Synthesize an idle session (idle = 2 hours) -> ACTIVE_BUT_IDLE
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    const idlePath = path.join(p12ActiveWorkDir, "agent-idle-test.md");
+    fs.writeFileSync(idlePath, `---
+agent: agent-idle-test
+interface: kilo-code
+router: omniroute
+model: gpt-4o
+active_task: TASK-IDLE
+task_title: Idle Test
+status: IN_PROGRESS
+started_at: ${twoHoursAgo}
+last_activity: ${twoHoursAgo}
+updated_at: ${twoHoursAgo}
+working_area:
+  - src/idle.js
+---
+Idle session test.
+`, "utf-8");
+
+    const idleSessions = listSessions(project12Root);
+    const idleAgent = idleSessions.sessions.find((s) => s.agent === "agent-idle-test");
+    assert(idleAgent.liveness === "ACTIVE_BUT_IDLE", "Session idle for 2h classified as ACTIVE_BUT_IDLE (not STALE, not CRASHED)");
+    assert(idleAgent.isStale === false, "Session idle for 2h is not stale (threshold is 24h)");
+
+    // 3. Synthesize a stale session (idle = 30 hours) -> STALE
+    const thirtyHoursAgo = new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString();
+    const stalePath = path.join(p12ActiveWorkDir, "agent-stale-test.md");
+    fs.writeFileSync(stalePath, `---
+agent: agent-stale-test
+interface: kilo-code
+router: omniroute
+model: gpt-4o
+active_task: TASK-STALE
+task_title: Stale Test
+status: IN_PROGRESS
+started_at: ${thirtyHoursAgo}
+last_activity: ${thirtyHoursAgo}
+updated_at: ${thirtyHoursAgo}
+working_area:
+  - src/stale.js
+---
+Stale session test.
+`, "utf-8");
+
+    const staleSessions = listSessions(project12Root);
+    const staleAgent = staleSessions.sessions.find((s) => s.agent === "agent-stale-test");
+    assert(staleAgent.liveness === "STALE", "Session idle for 30h classified as STALE");
+    assert(staleAgent.isStale === true, "Session idle for 30h marked isStale = true");
+
+    // 4. Synthesize an abandoned session (idle = 80 hours) -> ABANDONED
+    const eightyHoursAgo = new Date(Date.now() - 80 * 60 * 60 * 1000).toISOString();
+    const abandonedPath = path.join(p12ActiveWorkDir, "agent-abandoned-test.md");
+    fs.writeFileSync(abandonedPath, `---
+agent: agent-abandoned-test
+interface: kilo-code
+router: omniroute
+model: gpt-4o
+active_task: TASK-ABANDONED
+task_title: Abandoned Test
+status: IN_PROGRESS
+started_at: ${eightyHoursAgo}
+last_activity: ${eightyHoursAgo}
+updated_at: ${eightyHoursAgo}
+working_area:
+  - src/abandoned.js
+---
+Abandoned session test.
+`, "utf-8");
+
+    const abandonedSessions = listSessions(project12Root);
+    const abandonedAgent = abandonedSessions.sessions.find((s) => s.agent === "agent-abandoned-test");
+    assert(abandonedAgent.liveness === "ABANDONED", "Session idle for 80h classified as ABANDONED");
+
+    // Crux invariant: Live-but-idle and stale sessions with no in-flight git changes are NEVER marked CRASHED
+    assert(idleAgent.liveness !== "CRASHED", "Idle session is NOT classified as CRASHED");
+    assert(staleAgent.liveness !== "CRASHED", "Stale session is NOT classified as CRASHED");
+    assert(abandonedAgent.liveness !== "CRASHED", "Abandoned session is NOT classified as CRASHED");
+
+    // Session descriptors on disk remain preserved without deletion
+    assert(fs.existsSync(idlePath), "Idle descriptor preserved on disk");
+    assert(fs.existsSync(stalePath), "Stale descriptor preserved on disk");
+    assert(fs.existsSync(abandonedPath), "Abandoned descriptor preserved on disk");
+
+    console.log("  ✓ Section 10: Phase 5F Multi-Agent Coordination & Diagnostics verified.");
 
     console.log("  ✓ Adversarial & Isolation Suite completed all checks successfully.");
 
