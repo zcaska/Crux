@@ -8,7 +8,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 import { initProjectContext, readFileSafe } from "../src/index.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Runs the decoupling and boundary test suite.
@@ -20,7 +24,13 @@ export async function runDecouplingTests(rootDir, assert) {
   console.log("Project Context OS — Core Decoupling & Boundary Suite");
   console.log("================================================================\n");
 
-  const srcDir = path.join(rootDir, "tools", "project-context", "src");
+  const srcDir = fs.existsSync(path.join(__dirname, "..", "src"))
+    ? path.join(__dirname, "..", "src")
+    : (fs.existsSync(path.join(rootDir, "src"))
+      ? path.join(rootDir, "src")
+      : (fs.existsSync(path.join(rootDir, "node_modules", "@project-context", "core", "src"))
+        ? path.join(rootDir, "node_modules", "@project-context", "core", "src")
+        : path.join(rootDir, "tools", "project-context", "src")));
   assert(fs.existsSync(srcDir), "tools/project-context/src directory exists");
 
   const srcFiles = fs.readdirSync(srcDir).filter((f) => f.endsWith(".js"));
@@ -44,7 +54,13 @@ export async function runDecouplingTests(rootDir, assert) {
   // 2. Package Boundaries: Core tool package.json
   console.log("\n── 2. Package Boundary Integrity ──");
 
-  const corePkgPath = path.join(rootDir, "tools", "project-context", "package.json");
+  const corePkgPath = fs.existsSync(path.join(__dirname, "..", "package.json"))
+    ? path.join(__dirname, "..", "package.json")
+    : (fs.existsSync(path.join(rootDir, "node_modules", "@project-context", "core", "package.json"))
+      ? path.join(rootDir, "node_modules", "@project-context", "core", "package.json")
+      : (fs.existsSync(path.join(rootDir, "package.json")) && JSON.parse(fs.readFileSync(path.join(rootDir, "package.json"), "utf-8")).name === "@project-context/core"
+        ? path.join(rootDir, "package.json")
+        : path.join(rootDir, "tools", "project-context", "package.json")));
   assert(fs.existsSync(corePkgPath), "tools/project-context/package.json exists");
   const corePkg = JSON.parse(fs.readFileSync(corePkgPath, "utf-8"));
 

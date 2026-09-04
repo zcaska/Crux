@@ -25,6 +25,9 @@ import { startSession, checkWorkingAreaCollisions, listSessions } from "../src/s
 import { getAgentBootstrap, formatBootstrapMarkdown } from "../src/bootstrap.js";
 import { getContextDir } from "../src/core.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export async function runPhase3CapabilityTests(rootDir, assert) {
   console.log("\n================================================================");
   console.log("Project Context OS — Phase 3 Capability Test Suite");
@@ -39,7 +42,12 @@ export async function runPhase3CapabilityTests(rootDir, assert) {
   assert(invRes.summary.errors === 0, "Zero invariant error violations on baseline");
 
   // Controlled violation: Injecting Supabase import into tools/project-context
-  const tempViolationFile = path.join(rootDir, "tools", "project-context", "src", "temp-violation-test.js");
+  const targetDir = fs.existsSync(path.join(rootDir, "tools", "project-context", "src"))
+    ? path.join(rootDir, "tools", "project-context", "src")
+    : (fs.existsSync(path.join(rootDir, "src"))
+      ? path.join(rootDir, "src")
+      : path.join(rootDir, "node_modules", "@project-context", "core", "src"));
+  const tempViolationFile = path.join(targetDir, "temp-violation-test.js");
   try {
     const forbiddenPkg = "@supabase/" + "supabase-js";
     fs.writeFileSync(tempViolationFile, `import { createClient } from "${forbiddenPkg}";\n`);
@@ -175,7 +183,9 @@ export async function runPhase3CapabilityTests(rootDir, assert) {
   // 7. Phase 3 MCP Server Verification (29 Tools over STDIO)
   // ───────────────────────────────────────────────────────────────────────────
   console.log("\n── 7. Phase 3 MCP Server (29 Official Tools) ──");
-  const serverScript = path.join(rootDir, "tools", "project-context", "src", "mcp-server.js");
+  const serverScript = fs.existsSync(path.join(__dirname, "..", "src", "mcp-server.js"))
+    ? path.join(__dirname, "..", "src", "mcp-server.js")
+    : path.join(rootDir, "tools", "project-context", "src", "mcp-server.js");
   const transport = new StdioClientTransport({
     command: process.execPath,
     args: [serverScript],

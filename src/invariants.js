@@ -24,7 +24,14 @@ export function checkInvariants(rootDir) {
 
   // 1. ADR-001: Context OS must never import Supabase
   const toolsDir = path.join(rootDir, "tools", "project-context");
-  if (fs.existsSync(toolsDir)) {
+  const targetDir = fs.existsSync(toolsDir)
+    ? toolsDir
+    : (fs.existsSync(path.join(rootDir, "src"))
+      ? path.join(rootDir, "src")
+      : (fs.existsSync(path.join(rootDir, "node_modules", "@project-context", "core", "src"))
+        ? path.join(rootDir, "node_modules", "@project-context", "core", "src")
+        : null));
+  if (targetDir) {
     const checkDirForSupabase = (dir) => {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
       for (const ent of entries) {
@@ -44,7 +51,7 @@ export function checkInvariants(rootDir) {
         }
       }
     };
-    checkDirForSupabase(toolsDir);
+    checkDirForSupabase(targetDir);
   }
 
   // 2. Project Invariant: Application Table Protection (Configured via config.json)

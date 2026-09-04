@@ -1,0 +1,16 @@
+# Secret environment files
+.env
+.env.*
+*.secret
+
+# Tunnel / Cloudflare / ngrok credentials & logs
+.cloudflared/
+*.pem
+*.key
+*.token
+ngrok.log
+tunnel.log
+
+# Build & cache artifacts
+.mcp-use/
+node_modules/

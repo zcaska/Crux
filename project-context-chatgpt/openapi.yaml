@@ -1,0 +1,47 @@
+openapi: 3.1.0
+info:
+  title: Project Context OS Bridge
+  description: Bridge for ChatGPT to read and write to local Project Context OS.
+  version: 1.0.0
+servers:
+  - url: https://patrol-approve-skimmed.ngrok-free.dev
+    description: Temporary ngrok tunnel bridge
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/projects/{projectId}/state:
+    get:
+      operationId: getProjectState
+      summary: Get Project State
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+  /api/projects/{projectId}/tasks:
+    get:
+      operationId: getTasks
+      summary: Get Tasks
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response

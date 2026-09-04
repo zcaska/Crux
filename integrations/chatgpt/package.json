@@ -1,0 +1,16 @@
+{
+  "name": "@project-context/adapter-chatgpt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-loopback.js"
+  },
+  "dependencies": {
+    "mcp-use": "^2.4.2",
+    "zod": "^3.24.2",
+    "@project-context/core": "file:../.."
+  }
+}

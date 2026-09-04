@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Project Context OS â€” Comprehensive Automated Test Suite
  *
  * Covers:
@@ -312,9 +312,13 @@ async function runTests() {
   const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
   const { StdioClientTransport } = await import("@modelcontextprotocol/sdk/client/stdio.js");
 
+  const mcpServerScript = fs.existsSync(path.join(__dirname, "..", "src", "mcp-server.js"))
+    ? path.join(__dirname, "..", "src", "mcp-server.js")
+    : path.join(rootDir, "tools", "project-context", "src", "mcp-server.js");
+
   const mcpTransport = new StdioClientTransport({
     command: "node",
-    args: ["tools/project-context/src/mcp-server.js"],
+    args: [mcpServerScript],
     cwd: rootDir,
   });
 

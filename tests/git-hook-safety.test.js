@@ -1,4 +1,4 @@
-﻿import { resolveProjectRoot } from "../src/locator.js";
+import { resolveProjectRoot } from "../src/locator.js";
 /**
  * Project Context OS â€” Git Hook Safety & Failure Path Test
  *
@@ -47,10 +47,14 @@ export async function runGitHookSafetyTest() {
   const hookRes = installGitHook(rootDir);
   assert(hookRes.success === true, "Pre-commit hook installed");
 
+  const binScript = fs.existsSync(path.join(__dirname, "..", "bin", "project-context.js"))
+    ? path.join(__dirname, "..", "bin", "project-context.js")
+    : path.join(rootDir, "tools", "project-context", "bin", "project-context.js");
+
   // 1. Normal Path: Validation passes cleanly
   let normalExitCode = 0;
   try {
-    execSync(`node tools/project-context/bin/project-context.js validate`, {
+    execSync(`node "${binScript}" validate`, {
       cwd: rootDir,
       stdio: "pipe",
     });
@@ -70,7 +74,7 @@ export async function runGitHookSafetyTest() {
   let failureExitCode = 0;
   let failureOutput = "";
   try {
-    failureOutput = execSync(`node tools/project-context/bin/project-context.js validate`, {
+    failureOutput = execSync(`node "${binScript}" validate`, {
       cwd: rootDir,
       stdio: "pipe",
     }).toString();

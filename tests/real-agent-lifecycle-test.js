@@ -1,4 +1,4 @@
-﻿import { resolveProjectRoot } from "../src/locator.js";
+import { resolveProjectRoot } from "../src/locator.js";
 /**
  * Project Context OS â€” Phase 2.1 Real-Agent Acceptance & Hardening Test
  *
@@ -111,8 +111,11 @@ export async function runRealAgentAcceptance() {
     assert(verifyA.step1.includes("real-agent-a"), "Agent A test passes: Step 1 verified in artifact");
 
     // 1.6 Agent A records semantic changelog entry via CLI
+    const binScript = fs.existsSync(path.join(__dirname, "..", "bin", "project-context.js"))
+      ? path.join(__dirname, "..", "bin", "project-context.js")
+      : path.join(rootDir, "tools", "project-context", "bin", "project-context.js");
     execSync(
-      `node tools/project-context/bin/project-context.js change --task "${taskId}" --summary "Agent A completed Step 1 of disposable handoff artifact"`,
+      `node "${binScript}" change --task "${taskId}" --summary "Agent A completed Step 1 of disposable handoff artifact"`,
       { cwd: rootDir, stdio: "pipe" }
     );
     assert(fs.readFileSync(changelogPath, "utf-8").includes("completed Step 1"), "Agent A records semantic change in CHANGELOG.md");
@@ -189,7 +192,7 @@ export async function runRealAgentAcceptance() {
 
     // 3.4 Agent B records semantic change
     execSync(
-      `node tools/project-context/bin/project-context.js change --task "${taskId}" --summary "Agent B completed Step 2 of disposable handoff artifact"`,
+      `node "${binScript}" change --task "${taskId}" --summary "Agent B completed Step 2 of disposable handoff artifact"`,
       { cwd: rootDir, stdio: "pipe" }
     );
     assert(fs.readFileSync(changelogPath, "utf-8").includes("completed Step 2"), "Agent B records semantic change in CHANGELOG.md");

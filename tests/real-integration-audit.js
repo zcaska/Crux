@@ -1,4 +1,4 @@
-﻿import { resolveProjectRoot } from "../src/locator.js";
+import { resolveProjectRoot } from "../src/locator.js";
 /**
  * Project Context OS â€” Real Integration Audit
  *
@@ -50,12 +50,16 @@ export async function runRealIntegrationAudit() {
 
   // 1. MCP configuration is actually discoverable
   const vscodeMcpPath = path.join(rootDir, ".vscode", "mcp.json");
-  const templatePath = path.join(rootDir, "tools", "project-context", "templates", "kilo-mcp.json");
+  const templatePath = fs.existsSync(path.join(__dirname, "..", "templates", "kilo-mcp.json"))
+    ? path.join(__dirname, "..", "templates", "kilo-mcp.json")
+    : path.join(rootDir, "tools", "project-context", "templates", "kilo-mcp.json");
   const configDiscoverable = fs.existsSync(vscodeMcpPath) && fs.existsSync(templatePath);
   check(1, "MCP configuration is discoverable in workspace (.vscode/mcp.json)", configDiscoverable);
 
   // Connect client to MCP server over STDIO
-  const mcpServerPath = path.join(rootDir, "tools", "project-context", "src", "mcp-server.js");
+  const mcpServerPath = fs.existsSync(path.join(__dirname, "..", "src", "mcp-server.js"))
+    ? path.join(__dirname, "..", "src", "mcp-server.js")
+    : path.join(rootDir, "tools", "project-context", "src", "mcp-server.js");
   const mcpTransport = new StdioClientTransport({
     command: process.execPath,
     args: [mcpServerPath],
