@@ -1,6 +1,6 @@
-# Project Context OS v4.0.0
+# Project Context OS v5.0.0
 
-**Project Context OS (`@project-context/core`)** is a portable, vendor-neutral, repository-local context and agent-handoff infrastructure layer for software projects worked on by multiple AI agents and human engineers.
+**Project Context OS (`@project-context/core`)** is a portable, vendor-neutral, repository-local context, progressive fusion, and multi-agent coordination infrastructure layer for software projects worked on by multiple AI agents and human engineers.
 
 ---
 
@@ -13,28 +13,29 @@ When multiple coding agents (Antigravity, Claude, ChatGPT, Codex, Cursor, Kilo C
 * What remains unfinished or blocked?
 * What changes were actually verified with tests?
 
-External cloud databases (such as Supabase, Firestore, or proprietary platforms) introduce network dependencies, latency, secret management, cost, and vendor lock-in.
+External cloud databases introduce network dependencies, latency, secret management, cost, and vendor lock-in.
 
 ---
 
 ## The Solution
 
 Project Context OS establishes the **Git repository itself** as the canonical source of truth:
-1. **Repository-Local Markdown State** (`.project-context/`): Human-readable, Git-diffable, merge-friendly documents.
-2. **Universal Operating Protocol** (`AGENTS.md`): Strict 7-step lifecycle (`READ -> UNDERSTAND -> PLAN -> EXECUTE -> TEST -> RECORD -> HAND OFF`).
-3. **Universal CLI Tooling** (`project-context`): Instant queries, doctor diagnostics, and lifecycle commands.
-4. **Official MCP Server** (`@modelcontextprotocol/sdk`): Exposes **29 official tools** over STDIO JSON-RPC.
-5. **Multi-Agent Concurrency**: Per-agent active work tracking (`active-work/<agent>.md`) preventing concurrent overwrite collisions.
-6. **Immutable Handoffs** (`handoffs/`): Permanent, write-once handoff records ensuring historical auditability.
-7. **Context-Aware Smart Bootstrap**: Compact Hot Context briefings (~1,100 tokens) providing an 83%+ reduction in context overhead.
-8. **Dynamic Root Resolution & Path Jailing**: Upward root discovery with directory traversal protection.
-9. **Multi-Model Interoperability**: 4-dimensional identity separation (`Agent`, `Interface`, `Router`, `Model`) enabling seamless model switching (e.g. Gemini -> Claude via OmniRoute).
+1. **Repository-Local Markdown State** (`.project-context/`): Human-readable, Git-diffable, merge-friendly documents as the authoritative semantic source of truth.
+2. **External Structural Bridge & Context Fusion** (`graphify-out/`): Read-only integration with Graphify code dependency graphs; dual-source progressive context fusion combines semantic and structural reality.
+3. **Universal Operating Protocol** (`AGENTS.md`): Strict 7-step lifecycle (`READ -> UNDERSTAND -> PLAN -> EXECUTE -> TEST -> RECORD -> HAND OFF`) with collision avoidance.
+4. **Universal CLI Tooling** (`project-context`): Instant queries, health diagnostics, drift audits, and lifecycle commands.
+5. **Official MCP Server** (`@modelcontextprotocol/sdk`): Exposes **29 official tools** over STDIO JSON-RPC.
+6. **Multi-Agent Concurrency & Collision Diagnostics**: Isolated per-agent descriptors (`active-work/<agent>.md`) with deterministic working-area collision detection.
+7. **Immutable Handoffs** (`handoffs/`): Permanent, write-once handoff records ensuring historical auditability.
+8. **Context-Aware Smart Bootstrap & Harmonized Snapshots**: Compact Hot Context briefings (~1,100 tokens) with bounded structural pointers.
+9. **Dynamic Root Resolution & Path Jailing**: Upward root discovery with directory traversal protection.
+10. **Multi-Model Interoperability**: 4-dimensional identity separation (`Agent`, `Interface`, `Router`, `Model`) enabling seamless model switching (e.g. Gemini -> Claude via OmniRoute).
 
 ---
 
 ## Quick Start
 
-### In Any Software Repository (Standalone):
+### In Any Software Repository:
 
 ```bash
 # 1. Install package
@@ -43,8 +44,9 @@ npm install --save-dev @project-context/core
 # 2. Initialize context store
 npx project-context init --name "MyProject"
 
-# 3. Verify health
+# 3. Verify health & unified diagnostics
 npx project-context doctor
+npx project-context diagnostics
 
 # 4. Agent bootstrap
 npx project-context bootstrap --agent "antigravity"
@@ -53,15 +55,15 @@ npx project-context bootstrap --agent "antigravity"
 npx project-context mcp
 ```
 
-### In CareerOS Repository:
+### Core Verification & Inspection:
 
 ```bash
-npm run context:state        # View project snapshot
-npm run context:bootstrap    # Receive hot context briefing
-npm run context:health       # Assess 6-pillar context quality (0-100%)
-npm run context:validate     # Run integrity validator & secret scanner
-npm run context:handoff      # Generate an immutable agent handoff
-npm test                     # Run complete automated test suite
+npx project-context state              # View project snapshot
+npx project-context bootstrap          # Receive hot context briefing
+npx project-context health             # Assess 6-pillar context quality (0-100%)
+npx project-context validate           # Run integrity validator & secret scanner
+npx project-context diagnostics        # Export machine-readable operational diagnostics
+npm test                               # Run complete automated test suite (760 assertions)
 ```
 
 ---

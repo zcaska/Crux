@@ -1,113 +1,110 @@
-# Project Context OS — Architecture Specification
+# Project Context OS — Architecture Specification (v5.0.0)
 
-This document details the architectural design of **Project Context OS**, its component hierarchy, its separation from the CareerOS application, and its future-proof vendor-neutral design.
+This document details the architectural design of **Project Context OS (`@project-context/core`)**, its component boundaries, progressive context fusion, and vendor-neutral multi-agent execution model.
 
 ---
 
-## 1. Dual-Architecture Isolation
+## 1. Boundary Isolation & Project Locality
 
-A core tenet of this codebase is the absolute separation between the application product and the agent collaboration infrastructure:
+Project Context OS enforces complete decoupling between target application repositories and the persistent context layer:
 
 ```text
-                                CAREEROS REPOSITORY
-                                         │
-             ┌───────────────────────────┴───────────────────────────┐
-             │                                                       │
-   CareerOS Application                                    Project Context OS
-   (Product System)                                        (Agent Collaboration Layer)
-             │                                                       │
-   ┌─────────┴─────────┐                                   ┌─────────┴─────────┐
-   │                   │                                   │                   │
-Frontend            Backend                             Git Repository    .project-context/
-(Vite + React 19)   (Prisma + Services)                 Working Tree      Filesystem Store
-   │                   │                                   │                   │
-   └─────────┬─────────┘                                   └─────────┬─────────┘
-             │                                                       │
-          Supabase                                            Context OS Core
-     (PostgreSQL Database,                                  (Parsing, Validation,
-      Auth, App Edge Functions)                              Security, Snapshot)
-                                                                     │
-                                                           ┌─────────┴─────────┐
-                                                           │                   │
-                                                      Local CLI           Official MCP
-                                                   (project-context)     (@modelcontextprotocol/sdk)
-                                                           │                   │
-                                                           └─────────┬─────────┘
-                                                                     │
-                                                        Compatible Coding Agents
-                                                        (Antigravity, Claude, Codex,
-                                                         ChatGPT, Cursor, etc.)
+┌────────────────────────────────────────────────────────────────────────┐
+│                        TARGET HOST REPOSITORY                          │
+│                                                                        │
+│   Application Source Code             Project Context Layer            │
+│   (e.g. Node, Python, Rust, Go)       (.project-context/)              │
+│             ▲                                  ▲                       │
+│             │                                  │                       │
+└─────────────┼──────────────────────────────────┼───────────────────────┘
+              │                                  │
+              │                      ┌───────────┴──────────┐
+              │                      │ @project-context/core│
+              │                      │    (v5.0.0 Engine)   │
+              │                      └───────────┬──────────┘
+              │                                  │
+              │                      ┌───────────┴──────────┐
+              │                      │   CLI & MCP Server   │
+              │                      │ (29 Core / 8 ChatGPT)│
+              │                      └──────────────────────┘
+              │                                  ▲
+              │                                  │
+     Zero Dependency Coupling            Compatible AI Agents
+   (No app imports Context OS)         (Antigravity, Claude, Cursor)
 ```
 
 ### Invariants:
-1. **Application Source Code**: `frontend/` and `backend/` contain CareerOS product code. They never import, invoke, or depend on `.project-context/` or `tools/project-context/`.
-2. **Context OS Scope**: Context OS manages repository intelligence. It operates only within `.project-context/` and provides read-only inspection of source code and Git. It never modifies application business logic automatically.
-3. **Application Database**: Supabase remains CareerOS's application database (profiles, jobs, resumes, matches, interviews). Project Context OS does not use Supabase.
+1. **Core Decoupling**: Reusable engine code inside `src/` must NEVER import application business logic, application database clients, or application UI frameworks.
+2. **Domain-Neutrality**: The engine is purely generic. All domain rules, invariants, and protected paths are configured via `.project-context/config.json`.
+3. **No External Cloud Dependencies**: Context OS is strictly repository-local and offline-first. No external telemetry, vector DBs, or hosted cloud synchronization.
+4. **Path Jailing**: All file writes and reads pass through `assertWithinProject(targetPath, rootDir)` to prevent parent directory escapes and symlink hijacking.
 
 ---
 
-## 2. Source-of-Truth Hierarchy
+## 2. Tri-Authority Ground Truth Model
 
-When establishing project state, agents must respect this strict priority:
+When establishing project state, agents must respect this strict authority hierarchy:
 
-1. **Git Repository Status & Working Tree**: What code actually exists in the filesystem right now.
-2. **`.project-context/` Markdown Documents**: Authoritative project status, active tasks, decisions, and handoffs.
-3. **`AGENTS.md`**: Behavioral instructions and invariants.
-4. **Actual Source Code & Configuration Files**: Behavioral ground truth.
-5. **Git Commit History & Diffs**: Historical progression of changes.
+1. **Git Working Tree (Historical & Ground Truth)**: Working tree files, staging area, branch status, and commit history represent what physically exists in the repository right now.
+2. **`.project-context/` (Semantic Authority)**: Authoritative source of truth for project identity, active tasks, Architectural Decision Records (ADRs), per-agent concurrency records, and semantic changelogs.
+3. **`graphify-out/` (Structural Authority)**: Read-only external source of truth for AST relationships, hyperedges, community clusters, and god nodes. Crux consumes Graphify strictly via read-only inspection and progressive context fusion.
+4. **`AGENTS.md` (Operational Protocol)**: Authoritative rules governing agent interaction, 7-step lifecycle execution, and working-area collision avoidance.
 
 ---
 
-## 3. Hot Context vs Cold Context Partitioning
+## 3. Hot Context vs. Warm Context vs. Cold Context Partitioning
 
-LLMs have limited context windows and high latency/cost when processing large historical dumps. Project Context OS partitions context into two explicit tiers:
+Project Context OS partitions context into three deterministic tiers to maximize LLM token efficiency:
 
 ### Hot Context (Loaded on Agent Bootstrap)
-Information essential for immediate reasoning:
+Information essential for immediate reasoning (~1,100 tokens):
 * `STATE.md`: Authoritative concise project snapshot.
 * `ACTIVE-WORK.md`: Aggregated active work across all agents.
 * `active-work/<agent>.md`: The specific agent's active task descriptor.
 * Active tasks (`IN_PROGRESS` or `READY`) from `TASKS.md`.
 * Latest relevant handoff from `handoffs/`.
-* Recent decisions from `DECISIONS.md`.
-* Recent semantic changelog entries from `CHANGELOG.md`.
-* Uncommitted files from `git status`.
+* Git uncommitted changes from working tree.
+* Harmonized structural metadata from `graphify-out/` (state, node count, edge count).
+
+### Warm Context (Progressive Dual-Source Fusion)
+Dynamically retrieved based on the agent's target task or query:
+* **Semantic Ranking**: Overlapping ADRs, recent changes, and task definitions from `.project-context/`.
+* **Structural 1-Hop Neighbors**: Calling functions and direct dependencies extracted from `graphify-out/graph.json` without raw AST dumps.
 
 ### Cold Context (Retrieved On-Demand)
 Deep historical context retrieved only when specifically investigated:
 * Completed or cancelled tasks in `TASKS.md`.
-* Archived historical handoffs in `handoffs/`.
-* Older changelog records.
-* Historical superseded decisions in `DECISIONS.md`.
-* Full git diffs and commit histories.
-
-Cold context is queried through `search_project_context(query)` or `npm run context:search <query>`.
+* Historical superseded ADRs in `DECISIONS.md`.
+* Archived immutable handoffs in `handoffs/`.
+* Full git diffs and commit histories via `search_project_context`.
 
 ---
 
-## 4. Official Model Context Protocol (MCP) Integration
+## 4. Multi-Agent Coordination & Working-Area Collisions
 
-Rather than using proprietary AI APIs or non-standard JSON-RPC, Project Context OS adopts the **official Model Context Protocol Node.js SDK** (`@modelcontextprotocol/sdk`).
+Crux coordinates multiple autonomous agents without a centralized coordinator or locking daemon:
 
-```text
-Any MCP-Compatible Client
-(Antigravity, Claude Desktop, Cursor, Codex)
-            │  (STDIO JSON-RPC 2.0)
-            ▼
-   McpServer + StdioServerTransport
-   (tools/project-context/src/mcp-server.js)
-            │
-            ├─► Read Tools (11)
-            └─► Write Tools (7)
-                    │
-                    ▼
-            Context OS Core + Security Scanner
-                    │
-                    ▼
-            .project-context/ + Git
-```
+1. **Isolated Descriptors**: Each agent writes strictly to `.project-context/active-work/<agent>.md`.
+2. **Deterministic Collision Taxonomy**:
+   * `EXACT`: Both agents claim the identical file or directory.
+   * `CONTAINMENT_DIR_FILE`: One agent claims a directory while another claims a file within it.
+   * `CONTAINMENT_DIR_DIR`: Nested directory overlaps.
+   * `DISJOINT`: Non-overlapping paths (safe concurrent execution).
+3. **Advisory-Only Policy**: Collision detection is strictly read-only and advisory. Crux never automatically terminates sessions or reassigns file ownership.
+4. **Temporal Liveness vs. Crash State**: Elapsed idle time transitions sessions across `ACTIVE` (<=1h), `ACTIVE_BUT_IDLE` (1–24h), `STALE` (24–72h), and `ABANDONED` (>72h). A session is only evaluated as `CRASHED` if in-flight uncommitted Git modifications match its declared working area.
 
-### Architecture Benefits:
-* **Protocol Compliance**: Handles standard MCP handshakes, capability negotiation, tool listing, and typed tool calls.
-* **Vendor Neutrality**: Works with any AI vendor that supports MCP.
-* **Security Isolation**: Runs as a local subprocess communicating strictly via standard input/output.
+---
+
+## 5. Model Context Protocol (MCP) Boundaries
+
+Project Context OS provides two distinct, non-overlapping MCP surfaces:
+
+1. **Local Core MCP Server (`src/mcp-server.js`)**:
+   * Official `@modelcontextprotocol/sdk` STDIO transport.
+   * Exposes **29 tools** (14 read tools, 15 controlled write & intelligence tools) for local IDE agents (Antigravity, Claude Desktop, Cursor, Kilo Code).
+   * Enforces Zod input validation, path jailing, and anti-credential secret scrubbing.
+2. **Remote ChatGPT Adapter (`integrations/chatgpt/`)**:
+   * Streamable HTTP transport designed for ChatGPT Custom Web Actions.
+   * **Strictly frozen at exactly 8 read-only tools**: `get_context_snapshot`, `get_project_state`, `get_tasks`, `get_architecture`, `get_decisions`, `search_project_context`, `get_relevant_context`, `get_git_status`.
+   * Zero mutation endpoints, zero AST leaks, fixed project root jailing.
+

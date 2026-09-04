@@ -54,6 +54,7 @@ import { runModelInteropTests } from "./model-interop.test.js";
 import { runTokenEfficiencyTests } from "./token-efficiency.test.js";
 import { runDecouplingTests } from "./decoupling.test.js";
 import { runAdversarialPhase5Tests } from "./adversarial-phase5.test.js";
+import { runCleanRoomDistributionGate } from "./clean-room-gate.test.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -589,6 +590,11 @@ async function runTests() {
   // TEST GROUP 22: Phase 5 Adversarial & Multi-Project Isolation
   // ─────────────────────────────────────────────────────────────────────────
   await runAdversarialPhase5Tests(rootDir, assert);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEST GROUP 23: Phase 5G Clean-Room Release Distribution Gate
+  // ─────────────────────────────────────────────────────────────────────────
+  await runCleanRoomDistributionGate(assert);
 
   console.log("\n================================================================");
   console.log(`Test Results: ${passed} passed, ${failed} failed`);

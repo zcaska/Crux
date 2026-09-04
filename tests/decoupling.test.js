@@ -65,7 +65,7 @@ export async function runDecouplingTests(rootDir, assert) {
   const corePkg = JSON.parse(fs.readFileSync(corePkgPath, "utf-8"));
 
   assert(corePkg.name === "@project-context/core", "Core package name is '@project-context/core'");
-  assert(corePkg.version === "4.0.0", "Core package version is 4.0.0");
+  assert(corePkg.version === "5.0.0", "Core package version is 5.0.0");
   assert(!corePkg.dependencies["react"], "Core package does not depend on React");
   assert(!corePkg.dependencies["@supabase/supabase-js"], "Core package does not depend on Supabase");
 

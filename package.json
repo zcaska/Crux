@@ -1,6 +1,6 @@
 {
   "name": "@project-context/core",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Universal Project Context OS — Portable, repository-local multi-agent context and MCP server",
   "type": "module",
   "main": "src/index.js",

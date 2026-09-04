@@ -55,7 +55,7 @@ export function createProjectContextMcpServer(repoRoot = defaultRepoRoot) {
   const server = new McpServer(
     {
       name: "project-context-os",
-      version: "4.0.0",
+      version: "5.0.0",
     },
     {
       capabilities: {

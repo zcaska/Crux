@@ -1,4 +1,4 @@
-﻿# @project-context/core
+# @project-context/core
 
 **Universal Project Context OS — Portable, repository-local multi-agent context and MCP server.**
 
@@ -10,15 +10,15 @@ Project Context OS establishes the Git repository itself as the authoritative ca
 
 ### In Any Software Repository:
 
-`ash
+```bash
 npm install --save-dev @project-context/core
-`
+```
 
 Or install globally:
 
-`ash
+```bash
 npm install -g @project-context/core
-`
+```
 
 ---
 
@@ -28,36 +28,37 @@ npm install -g @project-context/core
 
 Run in your project root:
 
-`ash
+```bash
 npx project-context init --name MyProject
-`
+```
 
-This scaffolds the pristine, domain-neutral .project-context/ directory:
-- config.json — Project identity & custom invariants
-- STATE.md — Authoritative status and current milestone
-- TASKS.md — Project task board with acceptance criteria
-- ARCHITECTURE.md — Component boundaries & system architecture
-- DECISIONS.md — Architectural Decision Records (ADRs)
-- CHANGELOG.md — Semantic changelog (WHAT & WHY)
-- ACTIVE-WORK.md — Compiled view of active sessions
-- ctive-work/ — Isolated per-agent session descriptors
-- handoffs/ — Immutable, write-once agent handoff records
-- AGENTS.md — Universal 7-step operating protocol
-- .vscode/mcp.json — Automatic MCP discovery config
+This scaffolds the pristine, domain-neutral `.project-context/` directory:
+- `config.json` — Project identity & custom invariants
+- `STATE.md` — Authoritative status and current milestone
+- `TASKS.md` — Project task board with acceptance criteria
+- `ARCHITECTURE.md` — Component boundaries & system architecture
+- `DECISIONS.md` — Architectural Decision Records (ADRs)
+- `CHANGELOG.md` — Semantic changelog (WHAT & WHY)
+- `ACTIVE-WORK.md` — Compiled view of active sessions
+- `active-work/` — Isolated per-agent session descriptors
+- `handoffs/` — Immutable, write-once agent handoff records
+- `AGENTS.md` — Universal 7-step operating protocol
+- `.vscode/mcp.json` — Automatic MCP discovery config
 
 ### 2. Check Diagnostics
 
-`ash
+```bash
 npx project-context doctor
-`
+npx project-context diagnostics
+```
 
 Runs comprehensive environment, schema, and repository checks.
 
 ### 3. Agent Bootstrap
 
-`ash
+```bash
 npx project-context bootstrap --agent antigravity
-`
+```
 
 Delivers complete Hot Context briefing (reality, tasks, incoming handoff, Git ground truth).
 
@@ -65,25 +66,25 @@ Delivers complete Hot Context briefing (reality, tasks, incoming handoff, Git gr
 
 Launch the STDIO MCP server directly:
 
-`ash
+```bash
 npx project-context mcp
-`
+```
 
 Or configure your AI editor/IDE (Cursor, Claude Desktop, Kilo Code, Antigravity):
 
-`json
+```json
 {
-  mcpServers: {
-    project-context: {
-      command: npx,
-      args: [@project-context/core, mcp],
-      env: {
-        PROJECT_CONTEXT_ROOT: "
- }
- }
- }
+  "mcpServers": {
+    "project-context": {
+      "command": "npx",
+      "args": ["@project-context/core", "mcp"],
+      "env": {
+        "PROJECT_CONTEXT_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
 }
-`
+```
 
 Exposes 29 official MCP tools across context retrieval, task management, session registration, quality diagnostics, drift detection, and automated handoffs.
 

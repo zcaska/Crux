@@ -1,12 +1,12 @@
-# Project Context OS — Operational Handoff (v4.0.0)
+# Project Context OS — Operational Handoff (v5.0.0)
 
-This is the primary operational manual for engineers and agents using **Project Context OS** (`@project-context/core@4.0.0`).
+This is the primary operational manual for engineers and agents using **Project Context OS** (`@project-context/core@5.0.0`).
 
 ---
 
 ## 1. What is Project Context OS?
 
-Project Context OS is a portable, vendor-neutral, offline-first context management and multi-agent coordination system that lives directly inside your software repository. It stores canonical project memory in human-readable Markdown files under `.project-context/`, exposes an official Model Context Protocol (MCP) server with **29 tools**, and provides an offline CLI so that different AI agents and models can collaborate without losing state or requiring human re-explanation.
+Project Context OS is a portable, vendor-neutral, offline-first context management, progressive fusion, and multi-agent coordination system that lives directly inside your software repository. It stores canonical project memory in human-readable Markdown files under `.project-context/`, consumes external code relationship graphs from `graphify-out/` in read-only mode, exposes an official Model Context Protocol (MCP) server with **29 tools**, and provides an offline CLI so that different AI agents and models can collaborate without losing state or requiring human re-explanation.
 
 ---
 
@@ -18,7 +18,7 @@ In your repository root:
 npm install --save-dev @project-context/core
 
 # Or from an offline package tarball:
-npm install --save-dev ./project-context-core-4.0.0.tgz
+npm install --save-dev ./project-context-core-5.0.0.tgz
 ```
 
 ---
@@ -61,15 +61,14 @@ Antigravity connects via standard Model Context Protocol (MCP). In `.vscode/mcp.
   }
 }
 ```
-*(In CareerOS repository, `command: "node"` and `args: ["tools/project-context/src/mcp-server.js"]` connects directly to the local source).*
 
 When Antigravity opens the workspace, it automatically discovers all 29 tools.
 
 ---
 
-## 5. How Do I Connect Kilo Code?
+## 5. How Do I Connect Kilo Code / Cursor / Claude Desktop?
 
-Kilo Code connects via the exact same MCP protocol. Ensure `.kilo/mcp.json` (or `.vscode/mcp.json`) is configured:
+Connect via the exact same MCP protocol. Ensure client MCP settings are configured:
 ```json
 {
   "mcpServers": {
@@ -84,26 +83,26 @@ Kilo Code connects via the exact same MCP protocol. Ensure `.kilo/mcp.json` (or 
   }
 }
 ```
-**Architecture Rule**: Kilo Code interacts with `.project-context/` through MCP. Never maintain a second, duplicate Kilo-specific memory store.
+**Architecture Rule**: All AI interfaces interact with `.project-context/` through MCP or CLI. Never maintain a second, duplicate proprietary memory store.
 
 ---
 
 ## 6. How Does OmniRoute Fit?
 
 ```text
-[Kilo / Agent Interface]
-         │
-         ▼
-    [OmniRoute]  ────────► (Routes prompt to Gemini, Claude, OpenAI, etc.)
-         │
-         ▼
-     [AI Model]
-         │
-         ▼ (Invokes MCP tools)
-[Project Context OS]
-         │
-         ▼
- [.project-context/] ────► (Durable Canonical Truth in Git)
+[Agent Interface (Kilo / Cursor)]
+             │
+             ▼
+        [OmniRoute]  ────────► (Routes prompt to Gemini, Claude, OpenAI, etc.)
+             │
+             ▼
+         [AI Model]
+             │
+             ▼ (Invokes MCP tools)
+    [Project Context OS]
+             │
+             ▼
+     [.project-context/] ────► (Durable Canonical Truth in Git)
 ```
 
 OmniRoute is strictly a **model routing proxy**. It does **not** store context, track tasks, or manage memory. All project memory lives in `.project-context/`.
@@ -124,9 +123,10 @@ OmniRoute is strictly a **model routing proxy**. It does **not** store context, 
 
 ## 8. How Do I Use It with ChatGPT?
 
-Direct local STDIO MCP is **not supported** in ChatGPT Web (web browsers cannot communicate directly with local processes).
+### Mode A: Remote ChatGPT MCP Adapter (`@project-context/adapter-chatgpt`)
+Deploy the remote adapter over Streamable HTTP. It exposes exactly **8 curated read-only tools** (`get_context_snapshot`, `get_project_state`, `get_tasks`, `get_architecture`, `get_decisions`, `search_project_context`, `get_relevant_context`, `get_git_status`) configured with No-Auth or Bearer token authentication.
 
-Use the verified **Compact Snapshot Fallback**:
+### Mode B: Compact Snapshot Fallback
 1. Run:
    ```bash
    npx project-context snapshot
@@ -141,16 +141,21 @@ Use the verified **Compact Snapshot Fallback**:
 
 ## 9. How Does an Agent Start a Session?
 
+Before starting a session, check for collisions:
+```bash
+npx project-context diagnostics
+```
+Then register:
 * **Via MCP**:
   ```json
   {
-    "name": "start_session",
+    "name": "start_agent_session",
     "arguments": {
       "agent": "coder-1",
       "task_id": "TASK-001",
-      "title": "Database Schema Setup",
+      "task_title": "Database Schema Setup",
       "objective": "Create initial database migration",
-      "files": ["migrations/001_init.sql"]
+      "working_area": ["migrations/001_init.sql"]
     }
   }
   ```
@@ -173,12 +178,11 @@ Use the verified **Compact Snapshot Fallback**:
 * **Via MCP**:
   ```json
   {
-    "name": "end_session",
+    "name": "end_agent_session",
     "arguments": {
       "agent": "coder-1",
       "to_agent": "reviewer",
-      "next_action": "Review migrations/001_init.sql and run test suite",
-      "mark_completed": true
+      "next_action": "Review migrations/001_init.sql and run test suite"
     }
   }
   ```
@@ -187,8 +191,7 @@ Use the verified **Compact Snapshot Fallback**:
   npx project-context session-end \
     --agent coder-1 \
     --to reviewer \
-    --next "Review migrations/001_init.sql and run test suite" \
-    --mark-completed
+    --next "Review migrations/001_init.sql and run test suite"
   ```
 
 ---
@@ -210,7 +213,7 @@ The incoming agent resumes execution immediately without human intervention (**H
 
 ---
 
-## 12. How Do I Diagnose Problems?
+## 12. How Do I Diagnose & Reconcile Problems?
 
 Run this troubleshooting sequence in order:
 
@@ -218,26 +221,27 @@ Run this troubleshooting sequence in order:
 # 1. Environment & directory integrity
 npx project-context doctor
 
-# 2. Schema formatting & secret scan
-npx project-context validate
+# 2. Unified operational diagnostics (JSON export)
+npx project-context diagnostics
 
 # 3. 6-pillar Context Quality score (0-100%)
 npx project-context health
 
-# 4. Detect stale sessions or uncommitted files
+# 4. Check working-area collisions & consistency
 npx project-context check-consistency
 
-# 5. Detect Git <-> Context drift
-npx project-context drift
+# 5. Non-destructive reconciliation (if inconsistent)
+npx project-context init --adopt
 ```
 
 ---
 
-## 13. What Are the Known Limitations?
+## 13. What Are the Known Constraints & Invariants?
 
-1. **Path Jailing Lexical Normalization**: Path traversal security (`assertWithinProject`) resolves paths lexically (`path.resolve`). If your project root is hosted inside deeply nested symlinks outside the working drive, set `PROJECT_CONTEXT_ROOT` explicitly in `.env` or client configuration.
-2. **ChatGPT Web Direct MCP**: Web browser sandboxes cannot open local process sockets without external network tunneling. The compact snapshot workflow is the supported fallback.
-3. **Automated Schema Migration Runner**: Schema transformations across major versions are handled passively via default values in `src/config.js`. A formal `project-context migrate` runner is deferred to v5.0.0.
+1. **Path Jailing**: All paths are strictly validated to stay within the resolved project root. Path traversals (`../`) or escaping symlinks throw `PATH_TRAVERSAL_DETECTED` or `SYMLINK_ESCAPE_DETECTED`.
+2. **Read-Only External Graphify**: External code graphs in `graphify-out/` are strictly read-only. Crux never builds, overwrites, or executes Graphify.
+3. **Advisory Collision Detection**: Working area collision detection is advisory. Crux will never automatically terminate sessions or reassign files.
+4. **Frozen ChatGPT MCP Boundary**: Exactly 8 read-only tools are exposed over remote ChatGPT MCP.
 
 ---
 
@@ -247,3 +251,4 @@ npx project-context drift
 * **NEVER assume agents know your conversation history**: Always rely on `bootstrap_context` and handoffs. Agents do not share conversation memory across sessions.
 * **NEVER put API keys in `.project-context/`**: The built-in scanner blocks and rejects API keys (`sk-`, `ghp_`) and tokens automatically.
 * **NEVER edit another agent's active work file**: Each agent owns `.project-context/active-work/<agent>.md`. The aggregated `ACTIVE-WORK.md` is compiled automatically.
+
