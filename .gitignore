@@ -1,7 +1,9 @@
-﻿node_modules/
+node_modules/
 dist/
 coverage/
 *.log
 *.tgz
+.playwright-mcp/
+.mcp-use/
 .DS_Store
 Thumbs.db

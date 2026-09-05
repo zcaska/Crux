@@ -1,7 +1,7 @@
 # Crux Remote Context Synchronization — Phase 6 Architecture & Operating Manual
 
 > **Status**: Production Ready  
-> **Package**: `@project-context/core` v5.1.0  
+> **Package**: `@project-context/core` v5.0.0  
 > **Surface**: Crux Core Sync Engine & Manufact-Hosted ChatGPT MCP Adapter  
 
 ---
@@ -258,4 +258,4 @@ WITH CHECK (true);
 | **ChatGPT Tools** | Exactly 8 read-only tools; zero write tools; zero 9th tool | PASSED |
 | **Parameter Jailing** | No `project_id` or filesystem paths exposed to ChatGPT | PASSED |
 | **Clean-Room Packaging** | Gate 5G.5 verified with `npm pack` (29 files, 0 unwanted leaks) | PASSED |
-| **Regression Suite** | 832 core tests passed; 159 ChatGPT adapter tests passed | PASSED |
+| **Regression Suite** | 840 core tests passed; 191 ChatGPT adapter tests passed; 69 remote-sync tests passed | PASSED |
