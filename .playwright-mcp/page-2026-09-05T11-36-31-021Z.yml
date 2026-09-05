@@ -1,0 +1,413 @@
+- generic [ref=f55e1]:
+  - link "Skip to content" [ref=f55e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f55e6]:
+    - generic [ref=f55e8]:
+      - navigation "Sidebar":
+        - generic:
+          - generic:
+            - generic:
+              - button "Open sidebar"
+        - generic:
+          - generic:
+            - link "New chat":
+              - /url: /
+          - generic:
+            - button "Search"
+          - generic:
+            - button "Recents"
+        - generic:
+          - generic:
+            - button "Open profile menu":
+              - generic:
+                - generic:
+                  - img "Profile image"
+      - generic [ref=f55e9]:
+        - heading "Chat history" [level=2] [ref=f55e10]
+        - generic [ref=f55e11]:
+          - navigation "Chat history" [ref=f55e12]:
+            - generic [ref=f55e15]:
+              - link "Home" [ref=f55e16] [cursor=pointer]:
+                - /url: /
+                - generic [ref=f55e17]: ChatGPT
+              - generic [ref=f55e18]:
+                - button "Search" [ref=f55e19] [cursor=pointer]
+                - button "Close sidebar" [expanded] [ref=f55e22]
+            - list [ref=f55e26]:
+              - listitem [ref=f55e27]:
+                - link "New chat Control Shift O" [ref=f55e147] [cursor=pointer]:
+                  - /url: /
+                  - generic [ref=f55e148]: New chat
+                  - generic [ref=f55e155]:
+                    - generic "Control" [ref=f55e156]:
+                      - generic [ref=f55e157]: Ctrl
+                      - text: +
+                    - generic "Shift" [ref=f55e158]: +
+                    - generic [ref=f55e160]: O
+              - listitem
+            - link "Images" [ref=f55e35] [cursor=pointer]:
+              - /url: /images
+            - link "Library" [ref=f55e162] [cursor=pointer]:
+              - /url: /library?entry_point=sidebar
+            - link "Scheduled" [ref=f55e49] [cursor=pointer]:
+              - /url: /scheduled
+            - link "Plugins" [ref=f55e56] [cursor=pointer]:
+              - /url: /plugins
+            - link "Projects New project" [ref=f55e169] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=f55e170]: Projects
+              - button "New project" [ref=f55e178]
+            - link "Codex" [ref=f55e182] [cursor=pointer]:
+              - /url: /codex
+            - generic [ref=f55e63]: More
+            - generic [ref=f55e193]:
+              - generic [ref=f55e194]:
+                - button [expanded] [ref=f55e195] [cursor=pointer]:
+                  - heading "Recents" [level=2] [ref=f55e196]
+                - generic [ref=f55e197]:
+                  - link "New chat" [ref=f55e198] [cursor=pointer]:
+                    - /url: /
+                  - button "Organize chats" [ref=f55e202] [cursor=pointer]
+              - list [ref=f55e207]:
+                - listitem [ref=f55e208]:
+                  - link "Retrieve CareerOS Context" [ref=f55e209] [cursor=pointer]:
+                    - /url: /c/6a9bfe8a-e920-83ee-b0e1-5397f5fa8c2d
+                    - generic [ref=f55e213]:
+                      - button "Pin Retrieve CareerOS Context" [ref=f55e214]
+                      - button "Open conversation options for Retrieve CareerOS Context" [ref=f55e218]
+                - listitem [ref=f55e222]:
+                  - link "Retrieve project context" [ref=f55e223] [cursor=pointer]:
+                    - /url: /c/6a9bf41e-75a4-83ee-9267-7e6171460250
+                    - generic [ref=f55e231]:
+                      - button "Pin Retrieve project context" [ref=f55e232]
+                      - button "Open conversation options for Retrieve project context" [ref=f55e236]
+                - listitem [ref=f55e240]:
+                  - link "Write LinkedIn bio" [ref=f55e241] [cursor=pointer]:
+                    - /url: /c/6915daeb-22e0-8322-82cd-6bbda3e3db9c
+                    - generic [ref=f55e249]:
+                      - button "Pin Write LinkedIn bio" [ref=f55e250]
+                      - button "Open conversation options for Write LinkedIn bio" [ref=f55e254]
+                - listitem [ref=f55e258]:
+                  - link "Most polluted city now" [ref=f55e259] [cursor=pointer]:
+                    - /url: /c/68f773f8-2cdc-8323-8fd9-9a74c21275e3
+                    - generic [ref=f55e267]:
+                      - button "Pin Most polluted city now" [ref=f55e268]
+                      - button "Open conversation options for Most polluted city now" [ref=f55e272]
+                - listitem [ref=f55e276]:
+                  - link "New chat" [ref=f55e277] [cursor=pointer]:
+                    - /url: /c/68f76b73-e950-8320-a6d8-69b9df063300
+                    - generic [ref=f55e285]:
+                      - button "Pin New chat" [ref=f55e286]
+                      - button "Open conversation options for New chat" [ref=f55e290]
+                - listitem [ref=f55e294]:
+                  - link "Translate to Haryanvi" [ref=f55e295] [cursor=pointer]:
+                    - /url: /c/68f6829c-a6a0-8323-ba74-bbc7ff8064e4
+                    - generic [ref=f55e303]:
+                      - button "Pin Translate to Haryanvi" [ref=f55e304]
+                      - button "Open conversation options for Translate to Haryanvi" [ref=f55e308]
+                - listitem [ref=f55e312]:
+                  - link "Photo conversion request" [ref=f55e313] [cursor=pointer]:
+                    - /url: /c/68eb2932-0bdc-8324-9c0e-2991b89f9e18
+                    - generic [ref=f55e321]:
+                      - button "Pin Photo conversion request" [ref=f55e322]
+                      - button "Open conversation options for Photo conversion request" [ref=f55e326]
+                - listitem [ref=f55e330]:
+                  - link "Book Delhi Metro Discounted Tickets" [ref=f55e331] [cursor=pointer]:
+                    - /url: /c/68e9bdd4-f6e8-8324-b227-12db5bc653c7
+                    - generic [ref=f55e339]:
+                      - button "Pin Book Delhi Metro Discounted Tickets" [ref=f55e340]
+                      - button "Open conversation options for Book Delhi Metro Discounted Tickets" [ref=f55e344]
+                - listitem [ref=f55e348]:
+                  - link "Casual conversation" [ref=f55e349] [cursor=pointer]:
+                    - /url: /c/68e8f1d6-f644-8328-acf9-bdd822bd3a3f
+                    - generic [ref=f55e357]:
+                      - button "Pin Casual conversation" [ref=f55e358]
+                      - button "Open conversation options for Casual conversation" [ref=f55e362]
+                - listitem [ref=f55e366]:
+                  - link "Greeting conversation" [ref=f55e367] [cursor=pointer]:
+                    - /url: /c/68e8ef85-ca1c-832e-bf42-7ffc19824c42
+                    - generic [ref=f55e375]:
+                      - button "Pin Greeting conversation" [ref=f55e376]
+                      - button "Open conversation options for Greeting conversation" [ref=f55e380]
+                - listitem [ref=f55e384]:
+                  - link "Rope skipping for height" [ref=f55e385] [cursor=pointer]:
+                    - /url: /c/68e88b5b-b6bc-8322-9e1d-49c8862136f8
+                    - generic [ref=f55e393]:
+                      - button "Pin Rope skipping for height" [ref=f55e394]
+                      - button "Open conversation options for Rope skipping for height" [ref=f55e398]
+                - listitem [ref=f55e402]:
+                  - link "Abs workout frequency" [ref=f55e403] [cursor=pointer]:
+                    - /url: /c/68e6a1fd-f778-8323-abbf-6f29a9c56505
+                    - generic [ref=f55e411]:
+                      - button "Pin Abs workout frequency" [ref=f55e412]
+                      - button "Open conversation options for Abs workout frequency" [ref=f55e416]
+                - listitem [ref=f55e420]:
+                  - link "Biceps workout frequency" [ref=f55e421] [cursor=pointer]:
+                    - /url: /c/68e6a06c-e328-8323-947d-32e6f00f60fb
+                    - generic [ref=f55e429]:
+                      - button "Pin Biceps workout frequency" [ref=f55e430]
+                      - button "Open conversation options for Biceps workout frequency" [ref=f55e434]
+                - listitem [ref=f55e438]:
+                  - link "Compare Zoho Google business models" [ref=f55e439] [cursor=pointer]:
+                    - /url: /c/68e5fe9d-a87c-8322-a87f-06d965b50263
+                    - generic [ref=f55e447]:
+                      - button "Pin Compare Zoho Google business models" [ref=f55e448]
+                      - button "Open conversation options for Compare Zoho Google business models" [ref=f55e452]
+                - listitem [ref=f55e456]:
+                  - link "Building a network with no money" [ref=f55e457] [cursor=pointer]:
+                    - /url: /c/68e3af73-ad48-832f-b2f7-47fe8aaf41e6
+                    - generic [ref=f55e465]:
+                      - button "Pin Building a network with no money" [ref=f55e466]
+                      - button "Open conversation options for Building a network with no money" [ref=f55e470]
+                - listitem [ref=f55e474]:
+                  - link "Body part workout guide" [ref=f55e475] [cursor=pointer]:
+                    - /url: /c/68e382da-bdf4-8322-81d0-1dc10c52b2af
+                    - generic [ref=f55e483]:
+                      - button "Pin Body part workout guide" [ref=f55e484]
+                      - button "Open conversation options for Body part workout guide" [ref=f55e488]
+                - listitem [ref=f55e492]:
+                  - link "Hindi translation of verse" [ref=f55e493] [cursor=pointer]:
+                    - /url: /c/68e31e2f-4e30-8326-a01b-14eaeb22266c
+                    - generic [ref=f55e501]:
+                      - button "Pin Hindi translation of verse" [ref=f55e502]
+                      - button "Open conversation options for Hindi translation of verse" [ref=f55e506]
+                - listitem [ref=f55e510]:
+                  - link "Desi hukka adhikar jaati" [ref=f55e511] [cursor=pointer]:
+                    - /url: /c/68e2b222-89e8-8322-a9c0-67ea432605cb
+                    - generic [ref=f55e519]:
+                      - button "Pin Desi hukka adhikar jaati" [ref=f55e520]
+                      - button "Open conversation options for Desi hukka adhikar jaati" [ref=f55e524]
+                - listitem [ref=f55e528]:
+                  - link "Serum removal after 7 hours" [ref=f55e529] [cursor=pointer]:
+                    - /url: /c/68e2aecd-f828-8323-ad52-3e835d089567
+                    - generic [ref=f55e537]:
+                      - button "Pin Serum removal after 7 hours" [ref=f55e538]
+                      - button "Open conversation options for Serum removal after 7 hours" [ref=f55e542]
+                - listitem [ref=f55e546]:
+                  - link "Serum ka istemal" [ref=f55e547] [cursor=pointer]:
+                    - /url: /c/68e2ae38-ce44-8320-9fad-9a7afb67c884
+                    - generic [ref=f55e555]:
+                      - button "Pin Serum ka istemal" [ref=f55e556]
+                      - button "Open conversation options for Serum ka istemal" [ref=f55e560]
+                - listitem [ref=f55e564]:
+                  - link "Sweet and blood pressure" [ref=f55e565] [cursor=pointer]:
+                    - /url: /c/68e14246-0130-8322-8de5-185321fe6e42
+                    - generic [ref=f55e573]:
+                      - button "Pin Sweet and blood pressure" [ref=f55e574]
+                      - button "Open conversation options for Sweet and blood pressure" [ref=f55e578]
+                - listitem [ref=f55e582]:
+                  - link "Best serum for oily skin" [ref=f55e583] [cursor=pointer]:
+                    - /url: /c/68e0aea8-abd8-8323-96a7-40d3fb4c2f5b
+                    - generic [ref=f55e591]:
+                      - button "Pin Best serum for oily skin" [ref=f55e592]
+                      - button "Open conversation options for Best serum for oily skin" [ref=f55e596]
+                - listitem [ref=f55e600]:
+                  - link "OpenAI size comparison" [ref=f55e601] [cursor=pointer]:
+                    - /url: /c/68ddefce-163c-8330-ab3c-3238c4059f19
+                    - generic [ref=f55e609]:
+                      - button "Pin OpenAI size comparison" [ref=f55e610]
+                      - button "Open conversation options for OpenAI size comparison" [ref=f55e614]
+                - listitem [ref=f55e618]:
+                  - link "Agradecimiento mutuo" [ref=f55e619] [cursor=pointer]:
+                    - /url: /c/68dde73d-143c-8330-8cee-5622240b086b
+                    - generic [ref=f55e627]:
+                      - button "Pin Agradecimiento mutuo" [ref=f55e628]
+                      - button "Open conversation options for Agradecimiento mutuo" [ref=f55e632]
+                - listitem [ref=f55e636]:
+                  - link "Greeting exchange" [ref=f55e637] [cursor=pointer]:
+                    - /url: /c/68dd270c-4400-8330-b272-bde574c771b2
+                    - generic [ref=f55e645]:
+                      - button "Pin Greeting exchange" [ref=f55e646]
+                      - button "Open conversation options for Greeting exchange" [ref=f55e650]
+                - listitem [ref=f55e654]:
+                  - link "Vanakam language comparison" [ref=f55e655] [cursor=pointer]:
+                    - /url: /c/68dc0d95-aedc-8330-af8c-8dfee748030e
+                    - generic [ref=f55e663]:
+                      - button "Pin Vanakam language comparison" [ref=f55e664]
+                      - button "Open conversation options for Vanakam language comparison" [ref=f55e668]
+                - listitem [ref=f55e672]:
+                  - link "Greeting conversation" [ref=f55e673] [cursor=pointer]:
+                    - /url: /c/68db4683-4678-832a-a375-3a0f3672cd5d
+                    - generic [ref=f55e681]:
+                      - button "Pin Greeting conversation" [ref=f55e682]
+                      - button "Open conversation options for Greeting conversation" [ref=f55e686]
+                - listitem [ref=f55e690]:
+                  - link "Brain function improvement tips" [ref=f55e691] [cursor=pointer]:
+                    - /url: /c/68d9edae-1e90-8325-bd79-14643dff7356
+                    - generic [ref=f55e699]:
+                      - button "Pin Brain function improvement tips" [ref=f55e700]
+                      - button "Open conversation options for Brain function improvement tips" [ref=f55e704]
+          - button "Zenith Caska Free, open profile menu" [ref=f55e74] [cursor=pointer]:
+            - generic [ref=f55e75]:
+              - img "Profile image" [ref=f55e708]
+              - generic [ref=f55e78]:
+                - generic [ref=f55e79]: Zenith Caska
+                - generic [ref=f55e81]: Free
+            - button "Upgrade" [ref=f55e710]
+    - generic [ref=f55e87]:
+      - generic [ref=f55e88]:
+        - banner:
+          - generic [ref=f55e90]:
+            - button "Upgrade" [ref=f55e715] [cursor=pointer]
+            - generic [ref=f55e91]:
+              - button "Share" [ref=f55e721] [cursor=pointer]
+              - button "More" [ref=f55e726] [cursor=pointer]
+      - main [ref=f55e102]:
+        - generic [ref=f55e730]:
+          - generic [ref=f55e732]:
+            - generic [ref=f55e733]:
+              - generic [ref=f55e735]:
+                - heading "You said:" [level=4] [ref=f55e736]
+                - generic [ref=f55e738]:
+                  - generic [ref=f55e744]:
+                    - link "CareerOS Context" [ref=f55e746] [cursor=pointer]:
+                      - /url: /plugins/plugin_asdk_app_6a9bfe23e68481919a8c4bf1ca918760?plugin_detail_origin=inline_selection_pill
+                    - text: "Please use CareerOS Context to retrieve the project context: call get_context_snapshot, get_project_state, get_tasks, get_architecture, and get_decisions. Provide the exact project name, current status and phase, key architecture principles, and current tasks."
+                  - generic [ref=f55e751]:
+                    - group "Your message actions":
+                      - button "Copy message"
+                      - button "Share prompt"
+                      - button "Edit message"
+              - generic [ref=f55e754]:
+                - heading "ChatGPT said:" [level=4] [ref=f55e755]
+                - generic [ref=f55e757]:
+                  - generic [ref=f55e758]:
+                    - button "Open tool call list Called tool" [ref=f55e764] [cursor=pointer]:
+                      - generic [ref=f55e765]:
+                        - button "Open tool call list" [ref=f55e766]
+                        - generic [ref=f55e769]: Called tool
+                    - generic [ref=f55e774]:
+                      - paragraph [ref=f55e775]: I retrieved all five requested CareerOS Context sources.
+                      - heading "Project identity & state" [level=3] [ref=f55e776]
+                      - list [ref=f55e777]:
+                        - listitem [ref=f55e778]:
+                          - paragraph [ref=f55e779]:
+                            - strong [ref=f55e780]: "Project name:"
+                            - strong [ref=f55e781]: CareerOS
+                        - listitem [ref=f55e782]:
+                          - paragraph [ref=f55e783]:
+                            - strong [ref=f55e784]: "Current status:"
+                            - strong [ref=f55e785]: VERIFIED
+                        - listitem [ref=f55e786]:
+                          - paragraph [ref=f55e787]:
+                            - strong [ref=f55e788]: "Current phase:"
+                            - strong [ref=f55e789]: v4.0.0 Product Freeze & Operational Handoff
+                        - listitem [ref=f55e790]:
+                          - paragraph [ref=f55e791]:
+                            - strong [ref=f55e792]: "Objective:"
+                            - text: Project Context OS v4.0.0 is
+                            - strong [ref=f55e793]: FROZEN + INSTALLED + OPERATIONALLY READY
+                            - text: ", with 289/289 master assertions passing, 29/29 operational-freeze assertions passing, 29 official MCP tools operational, Grade-A context health, and zero unresolved release blockers."
+                      - heading "Key architecture principles" [level=3] [ref=f55e794]
+                      - list [ref=f55e795]:
+                        - listitem [ref=f55e796]:
+                          - paragraph [ref=f55e797]:
+                            - strong [ref=f55e798]: "Strict separation:"
+                            - text: CareerOS application and Project Context OS are distinct systems.
+                        - listitem [ref=f55e799]:
+                          - paragraph [ref=f55e800]:
+                            - strong [ref=f55e801]: "Zero Supabase dependency for Context OS:"
+                            - text: context is local and vendor-neutral.
+                        - listitem [ref=f55e802]:
+                          - paragraph [ref=f55e803]:
+                            - strong [ref=f55e804]: "Local canonical truth:"
+                            - code [ref=f55e805]: .project-context/
+                            - text: Markdown is the authoritative context store.
+                        - listitem [ref=f55e806]:
+                          - paragraph [ref=f55e807]:
+                            - strong [ref=f55e808]: "Git = factual history; Context OS = semantic meaning:"
+                            - text: Git records
+                            - emphasis [ref=f55e809]: what
+                            - text: changed; context records
+                            - emphasis [ref=f55e810]: why/meaning/next steps
+                            - text: .
+                        - listitem [ref=f55e811]:
+                          - paragraph [ref=f55e812]:
+                            - strong [ref=f55e813]: "Official MCP SDK:"
+                            - text: Context OS is exposed through
+                            - code [ref=f55e814]: "@modelcontextprotocol/sdk"
+                            - text: over STDIO JSON-RPC.
+                        - listitem [ref=f55e815]:
+                          - paragraph [ref=f55e816]:
+                            - strong [ref=f55e817]: "Multi-agent concurrency:"
+                            - text: per-agent
+                            - code [ref=f55e818]: active-work/<agent>.md
+                            - text: files prevent collisions.
+                        - listitem [ref=f55e819]:
+                          - paragraph [ref=f55e820]:
+                            - strong [ref=f55e821]: "Immutable handoffs:"
+                            - text: historical handoffs are write-once timestamped records.
+                        - listitem [ref=f55e822]:
+                          - paragraph [ref=f55e823]:
+                            - strong [ref=f55e824]: "Hot/Cold context partitioning:"
+                            - text: agents receive compact active context rather than full repository dumps.
+                        - listitem [ref=f55e825]:
+                          - paragraph [ref=f55e826]:
+                            - strong [ref=f55e827]: "Application invariants:"
+                            - text: don't casually modify/drop core tables, preserve Supabase auth, and maintain frontend build integrity.
+                      - heading "Current tasks" [level=3] [ref=f55e828]
+                      - paragraph [ref=f55e829]:
+                        - text: There are
+                        - strong [ref=f55e830]: 27 tasks
+                        - text: "in the task board:"
+                      - list [ref=f55e831]:
+                        - listitem [ref=f55e832]:
+                          - paragraph [ref=f55e833]:
+                            - strong [ref=f55e834]: "READY:"
+                            - text: TASK-031, TASK-030, TASK-029, TASK-028, TASK-027, TASK-026, TASK-025, TASK-016, TASK-015 — all low-priority test tasks.
+                        - listitem [ref=f55e835]:
+                          - paragraph [ref=f55e836]:
+                            - strong [ref=f55e837]: "COMPLETED:"
+                            - text: TASK-024, TASK-023, TASK-022, TASK-021, TASK-020 — ChatGPT HTTP Gateway work.
+                        - listitem [ref=f55e838]:
+                          - paragraph [ref=f55e839]:
+                            - strong [ref=f55e840]: "COMPLETED:"
+                            - text: TASK-019, TASK-018, TASK-017 — disposable consumer migration verification tasks.
+                        - listitem [ref=f55e841]:
+                          - paragraph [ref=f55e842]:
+                            - strong [ref=f55e843]: "COMPLETED:"
+                            - text: TASK-005 — Interview Coach Audio & Feedback Hardening.
+                        - listitem [ref=f55e844]:
+                          - paragraph [ref=f55e845]:
+                            - strong [ref=f55e846]: "COMPLETED:"
+                            - text: TASK-014, TASK-013, TASK-011, TASK-010, TASK-008, TASK-004, TASK-003, TASK-002, TASK-001 — the major Project Context OS and CareerOS implementation milestones.
+                      - paragraph [ref=f55e847]:
+                        - text: Notably,
+                        - strong [ref=f55e848]: TASK-002 (CareerOS Resume Parser Fine-Tuning)
+                        - text: is now marked
+                        - strong [ref=f55e849]: COMPLETED
+                        - text: ", including LaTeX/multi-column layout detection, frontend"
+                        - code [ref=f55e850]: layoutAnalysis
+                        - text: typing, and a successful frontend build.
+                      - paragraph [ref=f55e851]: The latest decisions reinforce the local-first architecture, deterministic context intelligence, multi-agent lifecycle automation, immutable handoffs, and official MCP integration. The most recent ADRs (ADR-007 through ADR-014) also record the HTTP bridge approach for ChatGPT integration.
+                  - group "Response actions" [ref=f55e853]:
+                    - button "Copy response" [ref=f55e854] [cursor=pointer]
+                    - button "Share" [ref=f55e859] [cursor=pointer]
+                    - button "Switch model" [ref=f55e866] [cursor=pointer]
+                    - button "More actions" [ref=f55e870] [cursor=pointer]
+            - generic [ref=f55e873]: ChatGPT can make mistakes. Check important info.
+          - generic:
+            - button [aria-hidden] [ref=f55e881] [cursor=pointer]
+            - generic [ref=f55e890]:
+              - complementary [ref=f55e895]:
+                - generic [ref=f55e896]:
+                  - generic [ref=f55e897]:
+                    - generic [ref=f55e898]:
+                      - heading "Improve accuracy for strategy and analysis" [level=3] [ref=f55e899]
+                      - generic [ref=f55e900]: Upgrade to Plus and use increased reasoning to develop strategy, analyze data, improve operations, and create work artifacts.
+                    - button "Get Plus" [ref=f55e905] [cursor=pointer]
+                  - button "Close" [ref=f55e908] [cursor=pointer]
+              - generic [ref=f55e912]:
+                - button "Add files and more" [ref=f55e915] [cursor=pointer]
+                - textbox "Chat with ChatGPT" [active] [ref=f55e918]:
+                  - paragraph [ref=f55e919]: Ask anything
+                - generic [ref=f55e920]:
+                  - button "Think" [ref=f55e924] [cursor=pointer]
+                  - generic [ref=f55e926]:
+                    - button "Start dictation" [ref=f55e928] [cursor=pointer]
+                    - button "Start Voice" [ref=f55e931] [cursor=pointer]
+              - button [aria-hidden] [ref=f55e934]
+              - button [aria-hidden] [ref=f55e935]
+              - button [aria-hidden] [ref=f55e936]
+  - alert [ref=f55e145]
+  - status [ref=f55e146]

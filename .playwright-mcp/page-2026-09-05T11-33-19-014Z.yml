@@ -1,0 +1,59 @@
+- generic [active] [ref=f51e1]:
+  - link "Skip to content" [ref=f51e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f51e5]:
+    - generic [ref=f51e7]:
+      - navigation "Sidebar":
+        - generic:
+          - generic:
+            - generic:
+              - button "Open sidebar"
+        - generic:
+          - generic:
+            - link "New chat":
+              - /url: /
+          - generic:
+            - button "Search"
+          - generic:
+            - button "Recents"
+        - generic:
+          - generic:
+            - button "Open profile menu"
+      - generic [ref=f51e8]:
+        - heading "Chat history" [level=2] [ref=f51e9]
+        - generic [ref=f51e10]:
+          - navigation "Chat history" [ref=f51e11]:
+            - generic [ref=f51e14]:
+              - link "Home" [ref=f51e15] [cursor=pointer]:
+                - /url: /
+                - generic [ref=f51e16]: ChatGPT
+              - generic [ref=f51e17]:
+                - button "Search" [ref=f51e18] [cursor=pointer]
+                - button "Close sidebar" [expanded] [ref=f51e21]
+            - list [ref=f51e25]:
+              - listitem [ref=f51e26]:
+                - link "New chat" [ref=f51e27] [cursor=pointer]:
+                  - /url: /
+              - listitem
+            - link "Images" [ref=f51e34] [cursor=pointer]:
+              - /url: /images
+            - link "Library" [ref=f51e41] [cursor=pointer]:
+              - /url: /library?entry_point=sidebar
+            - link "Scheduled" [ref=f51e48] [cursor=pointer]:
+              - /url: /scheduled
+            - link "Plugins" [ref=f51e55] [cursor=pointer]:
+              - /url: /plugins
+            - generic [ref=f51e62]: More
+          - button "Zenith Caska Free, open profile menu" [ref=f51e73] [cursor=pointer]:
+            - generic [ref=f51e77]:
+              - generic [ref=f51e78]: Zenith Caska
+              - generic [ref=f51e80]: Free
+    - main [ref=f51e87]:
+      - generic [ref=f51e90]:
+        - generic [ref=f51e91]:
+          - heading "Plugins" [level=1] [ref=f51e92]
+          - paragraph [ref=f51e93]: Work with ChatGPT across your favorite tools.
+        - search [ref=f51e96]:
+          - textbox "Search plugins" [ref=f51e99]
+  - alert [ref=f51e268]
+  - status [ref=f51e269]
