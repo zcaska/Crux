@@ -1,0 +1,170 @@
+- generic [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e229]:
+      - generic [ref=f1e230]:
+        - generic [ref=f1e231]:
+          - link [ref=f1e233] [cursor=pointer]:
+            - /url: /cloud/organizations
+            - heading "Manufact" [level=2] [ref=f1e246]
+          - generic [ref=f1e247]: /
+          - button "Anurag Pandey's Projects" [ref=f1e248]:
+            - generic [ref=f1e249] [cursor=pointer]:
+              - generic [ref=f1e254]: Anurag Pandey's Projects
+              - generic [aria-hidden] [ref=f1e372]: FREE
+          - generic [ref=f1e258]: /
+          - button "crux-mcp" [ref=f1e490]
+          - generic [ref=f1e495]: /
+          - 'button "Environment: main" [ref=f1e498] [cursor=pointer]':
+            - generic [ref=f1e503]:
+              - generic [ref=f1e504]: main
+              - generic "Running" [ref=f1e506]
+          - button "bold-forge-qu960.run.mcp-use.com/mcp" [ref=f1e514]
+        - generic [ref=f1e264]:
+          - navigation [ref=f1e265]:
+            - link [ref=f1e266] [cursor=pointer]:
+              - /url: https://github.com/mcp-use/mcp-use
+              - button "10.6k" [ref=f1e267]
+            - link "Discord" [ref=f1e269] [cursor=pointer]:
+              - /url: https://discord.gg/XkNkSkMz3V
+            - button "Docs" [ref=f1e270] [cursor=pointer]
+            - 'combobox "Theme: Auto" [ref=f1e272] [cursor=pointer]':
+              - generic [ref=f1e275]: System
+          - button [ref=f1e383] [cursor=pointer]:
+            - img "Anurag Pandey" [ref=f1e384]
+      - generic [ref=f1e281]:
+        - generic [ref=f1e285]:
+          - generic [ref=f1e287]:
+            - generic [ref=f1e520]:
+              - list [ref=f1e522]:
+                - listitem [ref=f1e523]:
+                  - link "Back to Org" [ref=f1e524] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/dashboard
+                - listitem [ref=f1e529]:
+                  - link "Overview" [ref=f1e530] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/overview
+                - listitem [ref=f1e537]:
+                  - link "Chat" [ref=f1e538] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/chat
+              - generic [ref=f1e542]:
+                - generic [ref=f1e543]: Primitives
+                - list [ref=f1e545]:
+                  - listitem [ref=f1e546]:
+                    - link "Tools" [ref=f1e547] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/tools
+                    - generic [ref=f1e551]: "8"
+                  - listitem [ref=f1e553]:
+                    - link "Prompts" [ref=f1e554] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/prompts
+                    - generic [ref=f1e559]: "0"
+                  - listitem [ref=f1e561]:
+                    - link "Resources" [ref=f1e562] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/resources
+                    - generic [ref=f1e567]: "0"
+              - generic [ref=f1e569]:
+                - generic [ref=f1e570]: Deployments
+                - list [ref=f1e572]:
+                  - listitem [ref=f1e573]:
+                    - link "Deployments" [ref=f1e574] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/deployments
+                  - listitem [ref=f1e581]:
+                    - link "Environment Variables" [active] [ref=f1e582] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/environment-variables
+                  - listitem [ref=f1e589]:
+                    - link "Network Requests" [ref=f1e590] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/observability
+              - generic [ref=f1e594]:
+                - generic [ref=f1e595]: Analytics
+                - list [ref=f1e597]:
+                  - listitem [ref=f1e598]:
+                    - link "Analytics" [ref=f1e599] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/analytics
+                  - listitem [ref=f1e603]:
+                    - link "Sessions" [ref=f1e604] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/sessions
+                  - listitem [ref=f1e610]:
+                    - link "Feedback" [ref=f1e611] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/feedback
+              - generic [ref=f1e615]:
+                - generic [ref=f1e616]: Testing
+                - list [ref=f1e618]:
+                  - listitem [ref=f1e619]:
+                    - link "Testing" [ref=f1e620] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/evals/suites
+              - generic [ref=f1e624]:
+                - generic [ref=f1e625]: Publish
+                - list [ref=f1e627]:
+                  - listitem [ref=f1e628]:
+                    - link "Public Chat" [ref=f1e629] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/public-chat
+                  - listitem [ref=f1e633]:
+                    - link "Checklist" [ref=f1e634] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/checklist
+                  - listitem [ref=f1e639]:
+                    - link "Submission pack" [ref=f1e640] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/submission-pack
+              - generic [ref=f1e647]:
+                - generic [ref=f1e648]: Settings
+                - list [ref=f1e650]:
+                  - listitem [ref=f1e651]:
+                    - link "Domains" [ref=f1e652] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/domains
+                  - listitem [ref=f1e657]:
+                    - link "Settings" [ref=f1e658] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/settings
+            - button "Scroll sidebar up" [ref=f1e977] [cursor=pointer]
+            - button "Scroll sidebar down" [ref=f1e403] [cursor=pointer]
+          - generic [ref=f1e408]:
+            - generic [ref=f1e409]:
+              - heading "Upgrade your plan" [level=4] [ref=f1e410]
+              - button "Dismiss upgrade prompt" [ref=f1e411] [cursor=pointer]
+            - paragraph [ref=f1e412]: Unlock additional team members, projects, and higher server count on the Hobby and Startup plans.
+            - generic [ref=f1e413]:
+              - link "Compare plans" [ref=f1e414] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing
+              - link "Upgrade" [ref=f1e415] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing?plan=hobby
+          - button "Collapse sidebar" [ref=f1e367] [cursor=pointer]
+        - generic [ref=f1e983]:
+          - generic [ref=f1e985]:
+            - generic [ref=f1e987]:
+              - heading "Environment Variables" [level=2] [ref=f1e988]
+              - paragraph [ref=f1e989]: Configure environment variables for your server. Changes take effect on the next deployment.
+            - button "Copy all variables as .env" [ref=f1e992] [cursor=pointer]: Copy all
+          - generic [ref=f1e995]:
+            - generic [ref=f1e996]:
+              - textbox "CLIENT_KEY..." [ref=f1e997]: SUPABASE_SECRET_KEY
+              - generic [ref=f1e998]:
+                - textbox [ref=f1e999]: sb_publishable_fcbOUua9u-_8i8PhI_UdiA_Oxw5mvwi
+                - button "Mark as sensitive" [ref=f1e1000] [cursor=pointer]
+                - button [ref=f1e1001] [cursor=pointer]
+                - button [ref=f1e1002] [cursor=pointer]
+            - generic [ref=f1e1003]:
+              - textbox "CLIENT_KEY..." [ref=f1e1004]: SUPABASE_URL
+              - generic [ref=f1e1005]:
+                - textbox [ref=f1e1006]: https://bcesolytayzjvirtfjia.supabase.co
+                - button "Mark as sensitive" [ref=f1e1007] [cursor=pointer]
+                - button [ref=f1e1008] [cursor=pointer]
+                - button [ref=f1e1009] [cursor=pointer]
+            - generic [ref=f1e1010]:
+              - textbox "CLIENT_KEY..." [ref=f1e1011]: MCP_URL
+              - generic [ref=f1e1012]:
+                - textbox [ref=f1e1013]: https://bold-forge-qu960.run.mcp-use.com
+                - button "Mark as sensitive" [ref=f1e1014] [cursor=pointer]
+                - button [ref=f1e1015] [cursor=pointer]
+                - button [ref=f1e1016] [cursor=pointer]
+            - generic [ref=f1e1017]:
+              - textbox "CLIENT_KEY..." [ref=f1e1018]: CSP_URLS
+              - generic [ref=f1e1019]:
+                - textbox [ref=f1e1020]: https://bold-forge-qu960.run.mcp-use.com
+                - button "Mark as sensitive" [ref=f1e1021] [cursor=pointer]
+                - button [ref=f1e1022] [cursor=pointer]
+                - button [ref=f1e1023] [cursor=pointer]
+            - generic [ref=f1e1024]:
+              - button "Add Another" [ref=f1e1025] [cursor=pointer]
+              - generic [ref=f1e1026]: Paste the .env contents above to autofill
+              - generic [ref=f1e1027]: 0.1 KB / 64 KB
+  - alert [ref=f1e63]
+  - iframe [aria-hidden] [ref=f1e107]
+  - button "Open Intercom Messenger" [ref=f1e108] [cursor=pointer]
+  - generic [aria-hidden] [ref=f1e976]: "0"

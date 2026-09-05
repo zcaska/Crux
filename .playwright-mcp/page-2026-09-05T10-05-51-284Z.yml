@@ -1,0 +1,751 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e7]:
+        - link [ref=e9] [cursor=pointer]:
+          - /url: /
+          - heading "Manufact" [level=2] [ref=e21]
+        - navigation "Main" [ref=e22]:
+          - generic [ref=e24]:
+            - button "Platform" [ref=e26] [cursor=pointer]
+            - button "Solutions" [ref=e29] [cursor=pointer]
+            - generic [ref=e31]:
+              - link "Customers" [ref=e32] [cursor=pointer]:
+                - /url: /customer-stories
+              - link "Pricing" [ref=e34] [cursor=pointer]:
+                - /url: /pricing
+              - link "Blog" [ref=e36] [cursor=pointer]:
+                - /url: /blog
+            - button "Docs" [ref=e39] [cursor=pointer]
+        - generic [ref=e43]:
+          - link "10.6k" [ref=e44] [cursor=pointer]:
+            - /url: https://github.com/mcp-use/mcp-use
+          - link "Open Cloud dashboard" [ref=e48] [cursor=pointer]:
+            - /url: /cloud
+            - generic [ref=e49]: Cloud
+      - main [ref=e50]:
+        - generic [ref=e53]:
+          - main [ref=e62]:
+            - generic [ref=e65]:
+              - link "Open mcp-use on GitHub" [ref=e67] [cursor=pointer]:
+                - /url: https://www.ycombinator.com/launches/O2c-mcp-use-open-source-infrastructure-and-dev-tools-for-mcp-agents
+                - generic [ref=e68]:
+                  - generic [ref=e69]: Backed by
+                  - img "Y Combinator" [ref=e70]
+              - heading "Build and deploy MCP Apps and Servers" [level=1] [ref=e71]
+              - paragraph [ref=e72]:
+                - text: The mcp-use SDK is the fullstack MCP framework to develop MCP Apps for ChatGPT / Claude & MCP Servers for AI Agents.
+                - link "Loved by developers." [ref=e75] [cursor=pointer]:
+                  - /url: https://github.com/mcp-use/mcp-use
+              - generic [ref=e76]:
+                - link [ref=e77] [cursor=pointer]:
+                  - /url: /signup
+                  - button [ref=e78]
+                - link "Book a call" [ref=e84] [cursor=pointer]:
+                  - /url: /book-call
+              - button "Copy prompt for agents" [ref=e86] [cursor=pointer]
+          - generic [ref=e92]:
+            - paragraph [ref=e93]: Trusted by teams building on Manufact Cloud
+            - region "Manufact Cloud customers" [ref=e94]:
+              - generic [ref=e97]:
+                - link "Read the AgentMail customer case study" [ref=e99] [cursor=pointer]:
+                  - /url: /blog/agentmail-mcp-server-case-study
+                  - generic [ref=e100]:
+                    - img "AgentMail logo" [ref=e101]
+                    - generic [aria-hidden] [ref=e102]: Case study
+                - img "Alpha Vantage logo" [ref=e108]
+                - img "Casco logo" [ref=e111]
+                - img "CoinGecko logo" [ref=e114]
+                - img "Context.dev logo" [ref=e117]
+                - img "Crustdata logo" [ref=e120]
+                - link "Read the iAhorro customer case study" [ref=e122] [cursor=pointer]:
+                  - /url: /blog/iahorro-mcp-app-launch
+                  - generic [ref=e123]:
+                    - img "iAhorro logo" [ref=e124]
+                    - generic [aria-hidden] [ref=e125]: Case study
+                - img "Joy logo" [ref=e131]
+                - link "Read the Meilleurtaux customer case study" [ref=e133] [cursor=pointer]:
+                  - /url: /blog/meilleurtaux-mcp-app-launch
+                  - generic [ref=e134]:
+                    - img "Meilleurtaux logo" [ref=e135]
+                    - generic [aria-hidden] [ref=e136]: Case study
+                - link "Read the PredictLeads customer case study" [ref=e141] [cursor=pointer]:
+                  - /url: /blog/predictleads-mcp-marketplace-review
+                  - generic [ref=e142]:
+                    - img "PredictLeads logo" [ref=e143]
+                    - generic [aria-hidden] [ref=e144]: Case study
+                - img "Sixtyfour logo" [ref=e150]
+                - link "Read the AgentMail customer case study" [ref=e152] [cursor=pointer]:
+                  - /url: /blog/agentmail-mcp-server-case-study
+                  - generic [ref=e153]:
+                    - img "AgentMail logo" [ref=e154]
+                    - generic [aria-hidden] [ref=e155]: Case study
+                - img "Alpha Vantage logo" [ref=e161]
+                - img "Casco logo" [ref=e164]
+                - img "CoinGecko logo" [ref=e167]
+                - img "Context.dev logo" [ref=e170]
+                - img "Crustdata logo" [ref=e173]
+                - link "Read the iAhorro customer case study" [ref=e175] [cursor=pointer]:
+                  - /url: /blog/iahorro-mcp-app-launch
+                  - generic [ref=e176]:
+                    - img "iAhorro logo" [ref=e177]
+                    - generic [aria-hidden] [ref=e178]: Case study
+                - img "Joy logo" [ref=e184]
+                - link "Read the Meilleurtaux customer case study" [ref=e186] [cursor=pointer]:
+                  - /url: /blog/meilleurtaux-mcp-app-launch
+                  - generic [ref=e187]:
+                    - img "Meilleurtaux logo" [ref=e188]
+                    - generic [aria-hidden] [ref=e189]: Case study
+                - link "Read the PredictLeads customer case study" [ref=e194] [cursor=pointer]:
+                  - /url: /blog/predictleads-mcp-marketplace-review
+                  - generic [ref=e195]:
+                    - img "PredictLeads logo" [ref=e196]
+                    - generic [aria-hidden] [ref=e197]: Case study
+                - img "Sixtyfour logo" [ref=e203]
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - heading "Your fastest path to the ChatGPT Apps Store and Claude Connectors." [level=2] [ref=e212]
+                - paragraph [ref=e213]: One codebase. Every surface where users and agents already work.
+              - generic [ref=e214]:
+                - generic [ref=e215]:
+                  - generic [ref=e216]: AI Chats
+                  - generic [ref=e217]:
+                    - generic [ref=e218]: ChatGPT
+                    - generic [ref=e219]: Claude
+                    - generic [ref=e220]: Gemini Enterprise
+                    - generic [ref=e221]: Copilot 365
+                    - generic [ref=e222]: CopilotKit
+                - generic [ref=e223]:
+                  - generic [ref=e224]: Coding agents
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: Codex
+                    - generic [ref=e227]: Claude Code
+                    - generic [ref=e228]: Cursor
+                    - generic [ref=e229]: VS Code
+                - generic [ref=e230]:
+                  - generic [ref=e231]: Internal agents
+                  - generic [ref=e232]:
+                    - generic [ref=e233]: OpenAI Agents
+                    - generic [ref=e234]: Claude Agent SDK
+                    - generic [ref=e235]: Mastra
+                    - generic [ref=e236]: Langchain
+                    - generic [ref=e237]: Vercel AI SDK
+              - link [ref=e239] [cursor=pointer]:
+                - /url: /signup
+                - button "Start building" [ref=e240]
+            - img "ChatGPT Apps Store and Claude Connectors" [ref=e248]
+          - generic [ref=e251]:
+            - generic [ref=e252]:
+              - heading "From first commit to production." [level=2] [ref=e253]
+              - paragraph [ref=e254]: Every step of the MCP lifecycle. No extra tools.
+            - generic [ref=e255]:
+              - generic [ref=e258]:
+                - generic [ref=e259]: build
+                - heading "Start from an SDK, a skill, or a vibe." [level=3] [ref=e261]
+                - paragraph [ref=e262]: Scaffold with the mcp-use SDK. Install a skill into your coding agent. Or describe your app and watch it scaffold. Already writing MCP servers? Drop your existing code in unchanged.
+                - list [ref=e263]:
+                  - listitem [ref=e264]:
+                    - link "SDK Scaffold in one command. 10.6k" [ref=e265] [cursor=pointer]:
+                      - /url: https://github.com/mcp-use/mcp-use
+                      - generic [ref=e266]:
+                        - generic [ref=e267]:
+                          - text: SDK
+                          - generic [ref=e268]: Scaffold in one command.
+                        - generic [ref=e269]: 10.6k
+                  - listitem [ref=e276]:
+                    - link "Skill Install the skill for your coding agent. Get the skill" [ref=e277] [cursor=pointer]:
+                      - /url: https://skills.sh/mcp-use/mcp-use/mcp-apps-builder
+                      - generic [ref=e278]:
+                        - generic [ref=e279]:
+                          - text: Skill
+                          - generic [ref=e280]: Install the skill for your coding agent.
+                        - generic [ref=e281]: Get the skill
+                  - listitem [ref=e288]:
+                    - link "Vibe Vibe code you MCP App Try Vibe" [ref=e289] [cursor=pointer]:
+                      - /url: https://manufact.com/vibe
+                      - generic [ref=e290]:
+                        - generic [ref=e291]:
+                          - text: Vibe
+                          - generic [ref=e292]: Vibe code you MCP App
+                        - generic [ref=e293]: Try Vibe
+              - generic [ref=e305]:
+                - generic [ref=e306]: deploy
+                - heading "One push. Live in seconds." [level=3] [ref=e308]
+                - paragraph [ref=e309]: Connect your repo once. Every push auto-deploys to Manufact Cloud. No YAML. No Dockerfile archaeology.
+                - list [ref=e310]:
+                  - listitem [ref=e311]:
+                    - generic [ref=e314]:
+                      - text: GitHub App
+                      - generic [ref=e315]: Connect once. Every push auto-deploys to Manufact Cloud.
+                  - listitem [ref=e316]:
+                    - generic [ref=e319]:
+                      - text: Preview per branch
+                      - generic [ref=e320]: A live, unique URL for every pull request
+                  - listitem [ref=e321]:
+                    - generic [ref=e324]:
+                      - text: Custom domains
+                      - generic [ref=e325]: Ship your app under your own domain. SSL handled.
+                - link [ref=e327] [cursor=pointer]:
+                  - /url: /signup?source=github
+                  - button "Connect" [ref=e328]
+              - generic [ref=e339]:
+                - generic [ref=e340]: publish
+                - heading "Derisk your path to the marketplaces." [level=3] [ref=e342]
+                - paragraph [ref=e343]: Get your app in front of users in ChatGPT and Claude. Submission assets generated for you. Share an embedded chat anywhere you already have an audience.
+                - list [ref=e344]:
+                  - listitem [ref=e345]:
+                    - generic [ref=e348]:
+                      - text: Marketplace checklists
+                      - generic [ref=e349]: Know when you're ready to submit
+                  - listitem [ref=e357]:
+                    - generic [ref=e360]:
+                      - text: Submission assets
+                      - generic [ref=e361]: Logo, copy, and screenshots generated for you
+                  - listitem [ref=e369]:
+                    - generic [ref=e372]:
+                      - text: Embedded chat
+                      - generic [ref=e373]: Automatic sharable chat for your mcp server
+                      - generic [ref=e376]:
+                        - generic [ref=e377]: mcp.acme.com
+                        - generic [ref=e378]: /chat
+              - generic [ref=e383]:
+                - generic [ref=e384]: iterate
+                - heading "Preview it before a user sees it." [level=3] [ref=e386]
+                - paragraph [ref=e387]: Cloud Inspector runs your MCP server against real clients. Fire tool calls, inspect JSON-RPC, swap models — no local setup.
+                - list [ref=e388]:
+                  - listitem [ref=e389]:
+                    - link "Cloud Inspector Debug from any browser. Open Inspector" [ref=e390] [cursor=pointer]:
+                      - /url: /inspector
+                      - generic [ref=e391]:
+                        - generic [ref=e392]:
+                          - text: Cloud Inspector
+                          - generic [ref=e393]: Debug from any browser.
+                        - generic [ref=e394]: Open Inspector
+                  - listitem [ref=e398]:
+                    - generic [ref=e401]:
+                      - text: Model swap
+                      - generic [ref=e402]: Test the same call against GPT, Claude, Gemini.
+                  - listitem [ref=e413]:
+                    - link "Automatic evals Across every model and client Try Evals" [ref=e414] [cursor=pointer]:
+                      - /url: /platform/cross-client-testing
+                      - generic [ref=e415]:
+                        - generic [ref=e416]:
+                          - text: Automatic evals
+                          - generic [ref=e417]: Across every model and client
+                        - generic [ref=e418]: Try Evals
+              - generic [ref=e426]:
+                - generic [ref=e427]: monitor
+                - heading "Don't go blind in production." [level=3] [ref=e429]
+                - paragraph [ref=e430]: See how people actually use your MCP app. Analytics, session replay, and observability built in — so you catch regressions before users report them.
+                - list [ref=e431]:
+                  - listitem [ref=e432]:
+                    - generic [ref=e435]:
+                      - text: Analytics
+                      - generic [ref=e436]: Traffic, tool-call volume, and latency at a glance.
+                  - listitem [ref=e437]:
+                    - generic [ref=e440]:
+                      - text: Session tracking
+                      - generic [ref=e441]: Replay a user's conversation end-to-end.
+                  - listitem [ref=e442]:
+                    - generic [ref=e445]:
+                      - text: Observability
+                      - generic [ref=e446]: Traces, error rates, and alerts on regressions.
+          - generic [ref=e452]:
+            - generic [ref=e453]:
+              - heading "Developers love" [level=2] [ref=e454]
+              - paragraph [ref=e455]: Thousands of dev-teams are building with mcp-use
+            - generic [ref=e456]:
+              - generic [ref=e458]:
+                - link "Been thinking about trying your @mcpuse today when I started building a ChatGPT app, but wasn't sure if it's the right use case. Now I assume it is 🙂 Paolo Perazzo Paolo Perazzo @SiVola" [ref=e459] [cursor=pointer]:
+                  - /url: https://x.com/SiVola/status/1993838266056102191
+                  - generic [ref=e460]:
+                    - paragraph [ref=e464]: Been thinking about trying your @mcpuse today when I started building a ChatGPT app, but wasn't sure if it's the right use case. Now I assume it is 🙂
+                    - generic [ref=e465]:
+                      - img "Paolo Perazzo" [ref=e467]
+                      - generic [ref=e468]:
+                        - generic [ref=e469]: Paolo Perazzo
+                        - generic [ref=e470]: "@SiVola"
+                - link "Great addition to the generic MCP Client collection. Kingsley Uyi Idehen Kingsley Uyi Idehen @kidehen" [ref=e471] [cursor=pointer]:
+                  - /url: https://x.com/kidehen/status/1911480727616606313
+                  - generic [ref=e472]:
+                    - paragraph [ref=e476]: Great addition to the generic MCP Client collection.
+                    - generic [ref=e477]:
+                      - img "Kingsley Uyi Idehen" [ref=e479]
+                      - generic [ref=e480]:
+                        - generic [ref=e481]: Kingsley Uyi Idehen
+                        - generic [ref=e482]: "@kidehen"
+                - 'link "Infra isn''t just plumbing. It''s distribution. Examples: AgentMail: inboxes for agents, mcp-use: MCP infra, DeepAware: RL for data center ops. Whoever owns the rails agents use to talk to the outside world ends up with Twilio-style power. Vedika Jain Vedika Jain @vedikaja_in" [ref=e483] [cursor=pointer]':
+                  - /url: https://x.com/vedikaja_in/status/1959080358215082036
+                  - generic [ref=e484]:
+                    - paragraph [ref=e488]: "Infra isn't just plumbing. It's distribution. Examples: AgentMail: inboxes for agents, mcp-use: MCP infra, DeepAware: RL for data center ops. Whoever owns the rails agents use to talk to the outside world ends up with Twilio-style power."
+                    - generic [ref=e489]:
+                      - img "Vedika Jain" [ref=e491]
+                      - generic [ref=e492]:
+                        - generic [ref=e493]: Vedika Jain
+                        - generic [ref=e494]: "@vedikaja_in"
+                - link "mcp-use is by far the best Python framework for building an agent MCP. It's so easy to set up an agent connected to MCP servers through the command line, that way I can quickly iterate on my MCP servers and test. Most people are using MCP servers in chat clients like Cursor / Claude Code, but MCP server use by agents will explode in the near future. I think it's important to test your server in an agent environment, and mcp-use provides that. Matt Wang Matt Wang @mcpjams" [ref=e495] [cursor=pointer]:
+                  - /url: https://x.com/mcpjams/status/1955008680719683768
+                  - generic [ref=e496]:
+                    - paragraph [ref=e500]: mcp-use is by far the best Python framework for building an agent MCP. It's so easy to set up an agent connected to MCP servers through the command line, that way I can quickly iterate on my MCP servers and test. Most people are using MCP servers in chat clients like Cursor / Claude Code, but MCP server use by agents will explode in the near future. I think it's important to test your server in an agent environment, and mcp-use provides that.
+                    - generic [ref=e501]:
+                      - img "Matt Wang" [ref=e503]
+                      - generic [ref=e504]:
+                        - generic [ref=e505]: Matt Wang
+                        - generic [ref=e506]: "@mcpjams"
+                - link "MCP-Use is the open source way to connect any LLM to any MCP server and build custom agents that have tool access, without using closed source or application clients. Adam Silverman Adam Silverman @adamsilverman" [ref=e507] [cursor=pointer]:
+                  - /url: https://x.com/adamsilverman/status/1916934060175462858
+                  - generic [ref=e508]:
+                    - paragraph [ref=e512]: MCP-Use is the open source way to connect any LLM to any MCP server and build custom agents that have tool access, without using closed source or application clients.
+                    - generic [ref=e513]:
+                      - img "Adam Silverman" [ref=e515]
+                      - generic [ref=e516]:
+                        - generic [ref=e517]: Adam Silverman
+                        - generic [ref=e518]: "@adamsilverman"
+                - link "that's why we love open-source! @NASA is building an agent with MCP using our library @mcpuse 🚀 pederzh pederzh @pederzh" [ref=e519] [cursor=pointer]:
+                  - /url: https://x.com/pederzh/status/1943477519375613989
+                  - generic [ref=e520]:
+                    - paragraph [ref=e524]: that's why we love open-source! @NASA is building an agent with MCP using our library @mcpuse 🚀
+                    - generic [ref=e525]:
+                      - img "pederzh" [ref=e527]
+                      - generic [ref=e528]:
+                        - generic [ref=e529]: pederzh
+                        - generic [ref=e530]: "@pederzh"
+                - link "Been thinking about trying your @mcpuse today when I started building a ChatGPT app, but wasn't sure if it's the right use case. Now I assume it is 🙂 Paolo Perazzo Paolo Perazzo @SiVola" [ref=e531] [cursor=pointer]:
+                  - /url: https://x.com/SiVola/status/1993838266056102191
+                  - generic [ref=e532]:
+                    - paragraph [ref=e536]: Been thinking about trying your @mcpuse today when I started building a ChatGPT app, but wasn't sure if it's the right use case. Now I assume it is 🙂
+                    - generic [ref=e537]:
+                      - img "Paolo Perazzo" [ref=e539]
+                      - generic [ref=e540]:
+                        - generic [ref=e541]: Paolo Perazzo
+                        - generic [ref=e542]: "@SiVola"
+                - link "Great addition to the generic MCP Client collection. Kingsley Uyi Idehen Kingsley Uyi Idehen @kidehen" [ref=e543] [cursor=pointer]:
+                  - /url: https://x.com/kidehen/status/1911480727616606313
+                  - generic [ref=e544]:
+                    - paragraph [ref=e548]: Great addition to the generic MCP Client collection.
+                    - generic [ref=e549]:
+                      - img "Kingsley Uyi Idehen" [ref=e551]
+                      - generic [ref=e552]:
+                        - generic [ref=e553]: Kingsley Uyi Idehen
+                        - generic [ref=e554]: "@kidehen"
+                - 'link "Infra isn''t just plumbing. It''s distribution. Examples: AgentMail: inboxes for agents, mcp-use: MCP infra, DeepAware: RL for data center ops. Whoever owns the rails agents use to talk to the outside world ends up with Twilio-style power. Vedika Jain Vedika Jain @vedikaja_in" [ref=e555] [cursor=pointer]':
+                  - /url: https://x.com/vedikaja_in/status/1959080358215082036
+                  - generic [ref=e556]:
+                    - paragraph [ref=e560]: "Infra isn't just plumbing. It's distribution. Examples: AgentMail: inboxes for agents, mcp-use: MCP infra, DeepAware: RL for data center ops. Whoever owns the rails agents use to talk to the outside world ends up with Twilio-style power."
+                    - generic [ref=e561]:
+                      - img "Vedika Jain" [ref=e563]
+                      - generic [ref=e564]:
+                        - generic [ref=e565]: Vedika Jain
+                        - generic [ref=e566]: "@vedikaja_in"
+                - link "mcp-use is by far the best Python framework for building an agent MCP. It's so easy to set up an agent connected to MCP servers through the command line, that way I can quickly iterate on my MCP servers and test. Most people are using MCP servers in chat clients like Cursor / Claude Code, but MCP server use by agents will explode in the near future. I think it's important to test your server in an agent environment, and mcp-use provides that. Matt Wang Matt Wang @mcpjams" [ref=e567] [cursor=pointer]:
+                  - /url: https://x.com/mcpjams/status/1955008680719683768
+                  - generic [ref=e568]:
+                    - paragraph [ref=e572]: mcp-use is by far the best Python framework for building an agent MCP. It's so easy to set up an agent connected to MCP servers through the command line, that way I can quickly iterate on my MCP servers and test. Most people are using MCP servers in chat clients like Cursor / Claude Code, but MCP server use by agents will explode in the near future. I think it's important to test your server in an agent environment, and mcp-use provides that.
+                    - generic [ref=e573]:
+                      - img "Matt Wang" [ref=e575]
+                      - generic [ref=e576]:
+                        - generic [ref=e577]: Matt Wang
+                        - generic [ref=e578]: "@mcpjams"
+                - link "MCP-Use is the open source way to connect any LLM to any MCP server and build custom agents that have tool access, without using closed source or application clients. Adam Silverman Adam Silverman @adamsilverman" [ref=e579] [cursor=pointer]:
+                  - /url: https://x.com/adamsilverman/status/1916934060175462858
+                  - generic [ref=e580]:
+                    - paragraph [ref=e584]: MCP-Use is the open source way to connect any LLM to any MCP server and build custom agents that have tool access, without using closed source or application clients.
+                    - generic [ref=e585]:
+                      - img "Adam Silverman" [ref=e587]
+                      - generic [ref=e588]:
+                        - generic [ref=e589]: Adam Silverman
+                        - generic [ref=e590]: "@adamsilverman"
+                - link "that's why we love open-source! @NASA is building an agent with MCP using our library @mcpuse 🚀 pederzh pederzh @pederzh" [ref=e591] [cursor=pointer]:
+                  - /url: https://x.com/pederzh/status/1943477519375613989
+                  - generic [ref=e592]:
+                    - paragraph [ref=e596]: that's why we love open-source! @NASA is building an agent with MCP using our library @mcpuse 🚀
+                    - generic [ref=e597]:
+                      - img "pederzh" [ref=e599]
+                      - generic [ref=e600]:
+                        - generic [ref=e601]: pederzh
+                        - generic [ref=e602]: "@pederzh"
+              - generic [ref=e604]:
+                - link "Awesome to see mcp-use support MCP-UI! We're aligning on the open spec with OAI and others to make sure the entire community benefits from complete compatibility Ido Salomon (Creator of MCP-UI) Ido Salomon (Creator of MCP-UI) @idosal1" [ref=e605] [cursor=pointer]:
+                  - /url: https://x.com/idosal1/status/1975491538592608565
+                  - generic [ref=e606]:
+                    - paragraph [ref=e610]: Awesome to see mcp-use support MCP-UI! We're aligning on the open spec with OAI and others to make sure the entire community benefits from complete compatibility
+                    - generic [ref=e611]:
+                      - img "Ido Salomon (Creator of MCP-UI)" [ref=e613]
+                      - generic [ref=e614]:
+                        - generic [ref=e615]: Ido Salomon (Creator of MCP-UI)
+                        - generic [ref=e616]: "@idosal1"
+                - link "mcp-use is really into something good here. Darren Shepherd (Obot AI) Darren Shepherd (Obot AI) @ibuildthecloud" [ref=e617] [cursor=pointer]:
+                  - /url: https://x.com/ibuildthecloud/status/1981734299654054169
+                  - generic [ref=e618]:
+                    - paragraph [ref=e622]: mcp-use is really into something good here.
+                    - generic [ref=e623]:
+                      - img "Darren Shepherd (Obot AI)" [ref=e625]
+                      - generic [ref=e626]:
+                        - generic [ref=e627]: Darren Shepherd (Obot AI)
+                        - generic [ref=e628]: "@ibuildthecloud"
+                - link "mcp-use (@mcpuse) is building open-source dev tools and infrastructure for MCP to help dev teams quickly build and deploy custom AI agents with MCP servers. Y Combinator Y Combinator @ycombinator" [ref=e629] [cursor=pointer]:
+                  - /url: https://x.com/ycombinator/status/1948443065166827962
+                  - generic [ref=e630]:
+                    - paragraph [ref=e634]: mcp-use (@mcpuse) is building open-source dev tools and infrastructure for MCP to help dev teams quickly build and deploy custom AI agents with MCP servers.
+                    - generic [ref=e635]:
+                      - img "Y Combinator" [ref=e637]
+                      - generic [ref=e638]:
+                        - generic [ref=e639]: Y Combinator
+                        - generic [ref=e640]: "@ycombinator"
+                - link "awesome to see @mcpuse on product hunt today! for everyone needing to build with or around MCP! and yes, we'll do a small hack night with them next week to put that to the test as well 😉 Philipp Krenn Philipp Krenn @xeraa" [ref=e641] [cursor=pointer]:
+                  - /url: https://x.com/xeraa/status/1955812407823229175
+                  - generic [ref=e642]:
+                    - paragraph [ref=e646]: awesome to see @mcpuse on product hunt today! for everyone needing to build with or around MCP! and yes, we'll do a small hack night with them next week to put that to the test as well 😉
+                    - generic [ref=e647]:
+                      - img "Philipp Krenn" [ref=e649]
+                      - generic [ref=e650]:
+                        - generic [ref=e651]: Philipp Krenn
+                        - generic [ref=e652]: "@xeraa"
+                - link "MCP evals is here in @deepeval, metric name taken from @mcpuse 👀 Jeffrey 🐬 Jeffrey 🐬 @jeffr_yyy" [ref=e653] [cursor=pointer]:
+                  - /url: https://x.com/jeffr_yyy/status/1956424021928448170
+                  - generic [ref=e654]:
+                    - paragraph [ref=e658]: MCP evals is here in @deepeval, metric name taken from @mcpuse 👀
+                    - generic [ref=e659]:
+                      - img "Jeffrey 🐬" [ref=e661]
+                      - generic [ref=e662]:
+                        - generic [ref=e663]: Jeffrey 🐬
+                        - generic [ref=e664]: "@jeffr_yyy"
+                - 'link "🚀 @mcpuse launched! Open source infrastructure and dev tools for MCP agents: \"Spin-up and aggregate MCP servers through a single endpoint and zero friction.\" Fondo Fondo @Fondocom" [ref=e665] [cursor=pointer]':
+                  - /url: https://x.com/Fondocom/status/1949862472254369929
+                  - generic [ref=e666]:
+                    - paragraph [ref=e670]: "🚀 @mcpuse launched! Open source infrastructure and dev tools for MCP agents: \"Spin-up and aggregate MCP servers through a single endpoint and zero friction.\""
+                    - generic [ref=e671]:
+                      - img "Fondo" [ref=e673]
+                      - generic [ref=e674]:
+                        - generic [ref=e675]: Fondo
+                        - generic [ref=e676]: "@Fondocom"
+                - link "Awesome to see mcp-use support MCP-UI! We're aligning on the open spec with OAI and others to make sure the entire community benefits from complete compatibility Ido Salomon (Creator of MCP-UI) Ido Salomon (Creator of MCP-UI) @idosal1" [ref=e677] [cursor=pointer]:
+                  - /url: https://x.com/idosal1/status/1975491538592608565
+                  - generic [ref=e678]:
+                    - paragraph [ref=e682]: Awesome to see mcp-use support MCP-UI! We're aligning on the open spec with OAI and others to make sure the entire community benefits from complete compatibility
+                    - generic [ref=e683]:
+                      - img "Ido Salomon (Creator of MCP-UI)" [ref=e685]
+                      - generic [ref=e686]:
+                        - generic [ref=e687]: Ido Salomon (Creator of MCP-UI)
+                        - generic [ref=e688]: "@idosal1"
+                - link "mcp-use is really into something good here. Darren Shepherd (Obot AI) Darren Shepherd (Obot AI) @ibuildthecloud" [ref=e689] [cursor=pointer]:
+                  - /url: https://x.com/ibuildthecloud/status/1981734299654054169
+                  - generic [ref=e690]:
+                    - paragraph [ref=e694]: mcp-use is really into something good here.
+                    - generic [ref=e695]:
+                      - img "Darren Shepherd (Obot AI)" [ref=e697]
+                      - generic [ref=e698]:
+                        - generic [ref=e699]: Darren Shepherd (Obot AI)
+                        - generic [ref=e700]: "@ibuildthecloud"
+                - link "mcp-use (@mcpuse) is building open-source dev tools and infrastructure for MCP to help dev teams quickly build and deploy custom AI agents with MCP servers. Y Combinator Y Combinator @ycombinator" [ref=e701] [cursor=pointer]:
+                  - /url: https://x.com/ycombinator/status/1948443065166827962
+                  - generic [ref=e702]:
+                    - paragraph [ref=e706]: mcp-use (@mcpuse) is building open-source dev tools and infrastructure for MCP to help dev teams quickly build and deploy custom AI agents with MCP servers.
+                    - generic [ref=e707]:
+                      - img "Y Combinator" [ref=e709]
+                      - generic [ref=e710]:
+                        - generic [ref=e711]: Y Combinator
+                        - generic [ref=e712]: "@ycombinator"
+                - link "awesome to see @mcpuse on product hunt today! for everyone needing to build with or around MCP! and yes, we'll do a small hack night with them next week to put that to the test as well 😉 Philipp Krenn Philipp Krenn @xeraa" [ref=e713] [cursor=pointer]:
+                  - /url: https://x.com/xeraa/status/1955812407823229175
+                  - generic [ref=e714]:
+                    - paragraph [ref=e718]: awesome to see @mcpuse on product hunt today! for everyone needing to build with or around MCP! and yes, we'll do a small hack night with them next week to put that to the test as well 😉
+                    - generic [ref=e719]:
+                      - img "Philipp Krenn" [ref=e721]
+                      - generic [ref=e722]:
+                        - generic [ref=e723]: Philipp Krenn
+                        - generic [ref=e724]: "@xeraa"
+                - link "MCP evals is here in @deepeval, metric name taken from @mcpuse 👀 Jeffrey 🐬 Jeffrey 🐬 @jeffr_yyy" [ref=e725] [cursor=pointer]:
+                  - /url: https://x.com/jeffr_yyy/status/1956424021928448170
+                  - generic [ref=e726]:
+                    - paragraph [ref=e730]: MCP evals is here in @deepeval, metric name taken from @mcpuse 👀
+                    - generic [ref=e731]:
+                      - img "Jeffrey 🐬" [ref=e733]
+                      - generic [ref=e734]:
+                        - generic [ref=e735]: Jeffrey 🐬
+                        - generic [ref=e736]: "@jeffr_yyy"
+                - 'link "🚀 @mcpuse launched! Open source infrastructure and dev tools for MCP agents: \"Spin-up and aggregate MCP servers through a single endpoint and zero friction.\" Fondo Fondo @Fondocom" [ref=e737] [cursor=pointer]':
+                  - /url: https://x.com/Fondocom/status/1949862472254369929
+                  - generic [ref=e738]:
+                    - paragraph [ref=e742]: "🚀 @mcpuse launched! Open source infrastructure and dev tools for MCP agents: \"Spin-up and aggregate MCP servers through a single endpoint and zero friction.\""
+                    - generic [ref=e743]:
+                      - img "Fondo" [ref=e745]
+                      - generic [ref=e746]:
+                        - generic [ref=e747]: Fondo
+                        - generic [ref=e748]: "@Fondocom"
+              - generic [ref=e750]:
+                - link "Really sharp execution, mcp-use nails the 'Vercel for MCP' play. Love how you've stripped deployment and aggregation down to a single endpoint with zero friction. Crypto infra teams, onchain data providers, and AI-powered DeFi dashboards could slot this in to speed up agent builds massively. Ctran.eth Ctran.eth @ctranbtw" [ref=e751] [cursor=pointer]:
+                  - /url: https://x.com/ctranbtw/status/1955736140260032723
+                  - generic [ref=e752]:
+                    - paragraph [ref=e756]: Really sharp execution, mcp-use nails the 'Vercel for MCP' play. Love how you've stripped deployment and aggregation down to a single endpoint with zero friction. Crypto infra teams, onchain data providers, and AI-powered DeFi dashboards could slot this in to speed up agent builds massively.
+                    - generic [ref=e757]:
+                      - img "Ctran.eth" [ref=e759]
+                      - generic [ref=e760]:
+                        - generic [ref=e761]: Ctran.eth
+                        - generic [ref=e762]: "@ctranbtw"
+                - 'link "🦜🤖 MCP-Use Tools - Just launched: An open-source library that connects any LLM to MCP tools for custom agents, featuring seamless integration with LangChain and support for web browsing, Airbnb search, and 3D modeling capabilities. LangChain LangChain @LangChainAI" [ref=e763] [cursor=pointer]':
+                  - /url: https://x.com/LangChainAI/status/1911449301542195582
+                  - generic [ref=e764]:
+                    - paragraph [ref=e768]: "🦜🤖 MCP-Use Tools - Just launched: An open-source library that connects any LLM to MCP tools for custom agents, featuring seamless integration with LangChain and support for web browsing, Airbnb search, and 3D modeling capabilities."
+                    - generic [ref=e769]:
+                      - img "LangChain" [ref=e771]
+                      - generic [ref=e772]:
+                        - generic [ref=e773]: LangChain
+                        - generic [ref=e774]: "@LangChainAI"
+                - 'link "We implemented Code Mode in mcp-use''s MCPClient . All you need to do is define which servers you want your agent to use, enable code mode, and you''re done! The client will expose two tools: - One that allows the agent to progressively discover which servers and tools are available - One that allows the agent to execute code in an environment where the MCP servers are available as Python modules (SDKs) Pietro Pietro @pietrozullo" [ref=e775] [cursor=pointer]':
+                  - /url: https://x.com/pietrozullo/status/1991537221900394857
+                  - generic [ref=e776]:
+                    - paragraph [ref=e780]: "We implemented Code Mode in mcp-use's MCPClient . All you need to do is define which servers you want your agent to use, enable code mode, and you're done! The client will expose two tools: - One that allows the agent to progressively discover which servers and tools are available - One that allows the agent to execute code in an environment where the MCP servers are available as Python modules (SDKs)"
+                    - generic [ref=e781]:
+                      - img "Pietro" [ref=e783]
+                      - generic [ref=e784]:
+                        - generic [ref=e785]: Pietro
+                        - generic [ref=e786]: "@pietrozullo"
+                - link "Really sharp execution, mcp-use nails the 'Vercel for MCP' play. Love how you've stripped deployment and aggregation down to a single endpoint with zero friction. Crypto infra teams, onchain data providers, and AI-powered DeFi dashboards could slot this in to speed up agent builds massively. Ctran.eth Ctran.eth @ctranbtw" [ref=e787] [cursor=pointer]:
+                  - /url: https://x.com/ctranbtw/status/1955736140260032723
+                  - generic [ref=e788]:
+                    - paragraph [ref=e792]: Really sharp execution, mcp-use nails the 'Vercel for MCP' play. Love how you've stripped deployment and aggregation down to a single endpoint with zero friction. Crypto infra teams, onchain data providers, and AI-powered DeFi dashboards could slot this in to speed up agent builds massively.
+                    - generic [ref=e793]:
+                      - img "Ctran.eth" [ref=e795]
+                      - generic [ref=e796]:
+                        - generic [ref=e797]: Ctran.eth
+                        - generic [ref=e798]: "@ctranbtw"
+                - 'link "🦜🤖 MCP-Use Tools - Just launched: An open-source library that connects any LLM to MCP tools for custom agents, featuring seamless integration with LangChain and support for web browsing, Airbnb search, and 3D modeling capabilities. LangChain LangChain @LangChainAI" [ref=e799] [cursor=pointer]':
+                  - /url: https://x.com/LangChainAI/status/1911449301542195582
+                  - generic [ref=e800]:
+                    - paragraph [ref=e804]: "🦜🤖 MCP-Use Tools - Just launched: An open-source library that connects any LLM to MCP tools for custom agents, featuring seamless integration with LangChain and support for web browsing, Airbnb search, and 3D modeling capabilities."
+                    - generic [ref=e805]:
+                      - img "LangChain" [ref=e807]
+                      - generic [ref=e808]:
+                        - generic [ref=e809]: LangChain
+                        - generic [ref=e810]: "@LangChainAI"
+                - 'link "We implemented Code Mode in mcp-use''s MCPClient . All you need to do is define which servers you want your agent to use, enable code mode, and you''re done! The client will expose two tools: - One that allows the agent to progressively discover which servers and tools are available - One that allows the agent to execute code in an environment where the MCP servers are available as Python modules (SDKs) Pietro Pietro @pietrozullo" [ref=e811] [cursor=pointer]':
+                  - /url: https://x.com/pietrozullo/status/1991537221900394857
+                  - generic [ref=e812]:
+                    - paragraph [ref=e816]: "We implemented Code Mode in mcp-use's MCPClient . All you need to do is define which servers you want your agent to use, enable code mode, and you're done! The client will expose two tools: - One that allows the agent to progressively discover which servers and tools are available - One that allows the agent to execute code in an environment where the MCP servers are available as Python modules (SDKs)"
+                    - generic [ref=e817]:
+                      - img "Pietro" [ref=e819]
+                      - generic [ref=e820]:
+                        - generic [ref=e821]: Pietro
+                        - generic [ref=e822]: "@pietrozullo"
+          - generic [ref=e825]:
+            - generic [ref=e826]:
+              - heading "Built in the open." [level=2] [ref=e827]
+              - paragraph [ref=e828]: One of the most adopted open-source MCP frameworks. Open from day one.
+            - generic [ref=e830]:
+              - generic [ref=e831]:
+                - generic [ref=e832]: 9M+
+                - paragraph [ref=e833]: SDK downloads across Python and TypeScript.
+                - generic [ref=e834]:
+                  - link "Python" [ref=e835] [cursor=pointer]:
+                    - /url: https://pypi.org/project/mcp-use/
+                  - link "TypeScript" [ref=e839] [cursor=pointer]:
+                    - /url: https://www.npmjs.com/package/mcp-use
+              - generic [ref=e843]:
+                - generic [ref=e844]: 10k+
+                - paragraph [ref=e845]: GitHub stars. Open-source since day one.
+                - link "Contribute" [ref=e847] [cursor=pointer]:
+                  - /url: https://github.com/mcp-use/mcp-use
+              - generic [ref=e851]:
+                - generic [ref=e852]: <60s
+                - paragraph [ref=e853]: From git push to live MCP App or Server.
+                - link "Deploy" [ref=e855] [cursor=pointer]:
+                  - /url: /signup
+            - generic [ref=e859]:
+              - paragraph [ref=e860]: Our open source tools are used by developers at top companies
+              - generic [ref=e864]:
+                - img "6sense logo" [ref=e866]
+                - img "Elastic logo" [ref=e868]
+                - img "IBM logo" [ref=e870]
+                - img "Innovacer logo" [ref=e872]
+                - img "Intuit logo" [ref=e874]
+                - img "NVIDIA logo" [ref=e876]
+                - img "Oracle logo" [ref=e878]
+                - img "Red Hat logo" [ref=e880]
+                - img "Tavily logo" [ref=e882]
+                - img "Verizon logo" [ref=e884]
+                - img "6sense logo" [ref=e886]
+                - img "Elastic logo" [ref=e888]
+                - img "IBM logo" [ref=e890]
+                - img "Innovacer logo" [ref=e892]
+                - img "Intuit logo" [ref=e894]
+                - img "NVIDIA logo" [ref=e896]
+                - img "Oracle logo" [ref=e898]
+                - img "Red Hat logo" [ref=e900]
+                - img "Tavily logo" [ref=e902]
+                - img "Verizon logo" [ref=e904]
+          - region [ref=e907]:
+            - generic [ref=e908]:
+              - heading "Frequently asked questions" [level=2] [ref=e909]
+              - paragraph [ref=e910]: Everything you need to build, deploy, test, and publish with Manufact.
+            - generic [ref=e911]:
+              - group [ref=e912]:
+                - generic "What is Manufact?" [ref=e913] [cursor=pointer]
+              - group [ref=e916]:
+                - generic "How fast can I deploy an MCP server on Manufact?" [ref=e917] [cursor=pointer]
+              - group [ref=e920]:
+                - generic "Which languages and frameworks does Manufact support?" [ref=e921] [cursor=pointer]
+              - group [ref=e924]:
+                - generic "How do I test an MCP server across different AI clients?" [ref=e925] [cursor=pointer]
+              - group [ref=e928]:
+                - generic "What is the MCP Inspector?" [ref=e929] [cursor=pointer]
+              - group [ref=e932]:
+                - generic "What analytics do I get for my MCP server?" [ref=e933] [cursor=pointer]
+              - group [ref=e936]:
+                - generic "How does authentication work for MCP servers on Manufact?" [ref=e937] [cursor=pointer]
+              - group [ref=e940]:
+                - generic "How do I publish an MCP app to the ChatGPT Apps Store or Claude Connectors?" [ref=e941] [cursor=pointer]
+              - group [ref=e944]:
+                - generic "Do pull requests get preview deployments?" [ref=e945] [cursor=pointer]
+              - group [ref=e948]:
+                - generic "Is mcp-use open source?" [ref=e949] [cursor=pointer]
+              - group [ref=e952]:
+                - generic "How much does Manufact cost?" [ref=e953] [cursor=pointer]
+              - group [ref=e956]:
+                - generic "Can I use Manufact without hosting my server there?" [ref=e957] [cursor=pointer]
+          - generic [ref=e969]:
+            - heading "Begin your MCP journey in the fastest way" [level=1] [ref=e970]:
+              - text: Begin your MCP journey in the
+              - generic [ref=e971]: fastest way
+            - generic [ref=e979]:
+              - generic [ref=e980]:
+                - heading "From a Git repository" [level=3] [ref=e985]
+                - paragraph [ref=e986]: Already have an MCP server on GitHub? Deploy it with one click.
+                - link [ref=e988] [cursor=pointer]:
+                  - /url: /signup?source=github
+                  - button "Connect GitHub" [ref=e989]
+              - generic [ref=e996]:
+                - generic [ref=e997]:
+                  - heading "Vibecode your MCP App" [level=3] [ref=e1003]
+                  - paragraph [ref=e1004]: Describe what you want. Watch your MCP server and widgets scaffold in front of you.
+                  - generic [ref=e1006]:
+                    - textbox "I want to build a cloud" [ref=e1007]:
+                      - /placeholder: "I want to build a cloud "
+                    - button "Send to Vibe" [ref=e1008]
+                  - link [ref=e1012] [cursor=pointer]:
+                    - /url: https://manufact.com/vibe
+                    - button "Start vibecoding" [ref=e1013]
+                - generic [ref=e1020]:
+                  - heading "From a template" [level=3] [ref=e1027]
+                  - paragraph [ref=e1028]: Pick one of our templates and start from a known-good scaffold.
+                  - generic [ref=e1030]:
+                    - link "Chart the monthly sales data Chart Builder widget Chart Builder" [ref=e1031] [cursor=pointer]:
+                      - /url: /templates
+                      - generic [ref=e1032]:
+                        - generic [ref=e1033]: Chart the monthly sales data
+                        - img "Chart Builder widget" [ref=e1036]
+                      - generic [ref=e1037]: Chart Builder
+                    - link "Draw the user signup flow Diagram Builder widget Diagram Builder" [ref=e1039] [cursor=pointer]:
+                      - /url: /templates
+                      - generic [ref=e1040]:
+                        - generic [ref=e1041]: Draw the user signup flow
+                        - img "Diagram Builder widget" [ref=e1044]
+                      - generic [ref=e1045]: Diagram Builder
+                  - link [ref=e1048] [cursor=pointer]:
+                    - /url: /templates
+                    - button "Browse templates" [ref=e1049]
+      - generic [ref=e1060]:
+        - generic [ref=e1061]:
+          - link [ref=e1062] [cursor=pointer]:
+            - /url: /
+            - heading "Manufact" [level=2] [ref=e1074]
+          - paragraph [ref=e1075]: © 2026 Manufact, Inc. - All rights reserved.
+          - generic [ref=e1077]:
+            - link "View Oneleet security" [ref=e1078] [cursor=pointer]:
+              - /url: https://oneleet.com
+              - img "Oneleet badge" [ref=e1079]
+            - link "View Oneleet security" [ref=e1080] [cursor=pointer]:
+              - /url: https://oneleet.com
+              - img "Oneleet badge" [ref=e1081]
+          - button "Toggle theme" [ref=e1082] [cursor=pointer]
+        - generic [ref=e1084]:
+          - generic [ref=e1085]:
+            - heading "Pages" [level=3] [ref=e1086]
+            - list [ref=e1087]:
+              - listitem [ref=e1088]:
+                - link "Docs" [ref=e1089] [cursor=pointer]:
+                  - /url: https://docs.mcp-use.com
+              - listitem [ref=e1090]:
+                - link "Developers" [ref=e1091] [cursor=pointer]:
+                  - /url: /developers
+              - listitem [ref=e1092]:
+                - link "Templates" [ref=e1093] [cursor=pointer]:
+                  - /url: /templates
+              - listitem [ref=e1094]:
+                - link "Manufact pricing" [ref=e1095] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e1096]:
+                - link "Blog" [ref=e1097] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e1098]:
+                - link "Careers" [ref=e1099] [cursor=pointer]:
+                  - /url: https://www.ycombinator.com/companies/manufact/jobs
+          - generic [ref=e1100]:
+            - heading "Platform" [level=3] [ref=e1101]
+            - list [ref=e1102]:
+              - listitem [ref=e1103]:
+                - link "MCP Hosting" [ref=e1104] [cursor=pointer]:
+                  - /url: /platform/hosting
+              - listitem [ref=e1105]:
+                - link "Cross-client testing" [ref=e1106] [cursor=pointer]:
+                  - /url: /platform/cross-client-testing
+              - listitem [ref=e1107]:
+                - link "Publishing checks" [ref=e1108] [cursor=pointer]:
+                  - /url: /platform/publishing-checks
+              - listitem [ref=e1109]:
+                - link "Submission pack" [ref=e1110] [cursor=pointer]:
+                  - /url: /platform/submission-pack
+              - listitem [ref=e1111]:
+                - link "Cloud Inspector" [ref=e1112] [cursor=pointer]:
+                  - /url: /platform/cloud-inspector
+              - listitem [ref=e1113]:
+                - link "Public chat" [ref=e1114] [cursor=pointer]:
+                  - /url: /platform/public-chat
+              - listitem [ref=e1115]:
+                - link "Analytics" [ref=e1116] [cursor=pointer]:
+                  - /url: /platform/analytics
+          - generic [ref=e1117]:
+            - heading "Products" [level=3] [ref=e1118]
+            - list [ref=e1119]:
+              - listitem [ref=e1120]:
+                - link "mcp-use" [ref=e1121] [cursor=pointer]:
+                  - /url: /mcp-use
+              - listitem [ref=e1122]:
+                - link "Vibecode MCP Apps" [ref=e1123] [cursor=pointer]:
+                  - /url: https://manufact.com/vibe
+              - listitem [ref=e1124]:
+                - link "Inspector" [ref=e1125] [cursor=pointer]:
+                  - /url: /inspector
+          - generic [ref=e1126]:
+            - heading "Socials" [level=3] [ref=e1127]
+            - list [ref=e1128]:
+              - listitem [ref=e1129]:
+                - link "Github" [ref=e1130] [cursor=pointer]:
+                  - /url: https://github.com/mcp-use
+              - listitem [ref=e1131]:
+                - link "LinkedIn" [ref=e1132] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/company/mcp-use
+              - listitem [ref=e1133]:
+                - link "X" [ref=e1134] [cursor=pointer]:
+                  - /url: https://x.com/manufact
+              - listitem [ref=e1135]:
+                - link "Discord" [ref=e1136] [cursor=pointer]:
+                  - /url: https://discord.gg/XkNkSkMz3V
+              - listitem [ref=e1137]:
+                - link "Product Hunt" [ref=e1138] [cursor=pointer]:
+                  - /url: https://www.producthunt.com/products/mcp-use
+          - generic [ref=e1139]:
+            - heading "Legal" [level=3] [ref=e1140]
+            - list [ref=e1141]:
+              - listitem [ref=e1142]:
+                - link "Privacy Policy" [ref=e1143] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e1144]:
+                - link "Terms of Service" [ref=e1145] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e1146]:
+                - link "Trust Center" [ref=e1147] [cursor=pointer]:
+                  - /url: https://trust.manufact.com
+  - alert [ref=e1148]

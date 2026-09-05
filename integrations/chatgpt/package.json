@@ -5,6 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "mcp-use build --entry index.js",
     "start": "node index.js",
     "test": "node test-loopback.js"
   },

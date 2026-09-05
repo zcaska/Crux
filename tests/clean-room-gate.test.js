@@ -54,7 +54,7 @@ export async function runCleanRoomDistributionGate(assert) {
     // 2. Inspect manifest contents for leakages
     console.log("── 2. Verifying tarball file manifest ──");
     const files = packMetadata[0].files.map((f) => f.path);
-    assert(files.length === 28, `Tarball contains exactly 28 whitelisted files (found ${files.length})`);
+    assert(files.length === 29, `Tarball contains exactly 29 whitelisted files (found ${files.length})`);
 
     // Ensure zero leakages
     const forbiddenPatterns = [
@@ -82,6 +82,7 @@ export async function runCleanRoomDistributionGate(assert) {
     assert(files.includes("src/relevance.js"), "Includes src/relevance.js");
     assert(files.includes("src/snapshot.js"), "Includes src/snapshot.js");
     assert(files.includes("src/session.js"), "Includes src/session.js");
+    assert(files.includes("src/sync.js"), "Includes src/sync.js");
 
     // 3. Set up isolated clean-room project
     console.log("── 3. Installing tarball into clean-room project ──");

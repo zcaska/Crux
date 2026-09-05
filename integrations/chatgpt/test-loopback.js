@@ -27,7 +27,12 @@ import { assertNoSecrets, initProjectContext } from "@project-context/core";
 import {
   startChatGPTAdapter,
   createChatGPTAdapter,
-  getTargetProjectRoot
+  getTargetProjectRoot,
+  MockTokenAuthenticator,
+  createTokenResolver,
+  hashToken,
+  extractTokenFromRequest,
+  RemoteContextProvider
 } from "./index.js";
 
 let passed = 0;
@@ -460,8 +465,183 @@ async function runComprehensiveLoopbackTests() {
   await noAuthClient.close();
   await noAuthAdapter.server.close();
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Section 15: Phase 6 Project-Bound Read-Token Authentication & Authorization
+  // ───────────────────────────────────────────────────────────────────────────
+  console.log("\n── 15. Phase 6 Project-Bound Read-Token Authentication & Authorization ──");
+
+  // 1. Token hashing determinism & format
+  const rawTokenAlpha = "crux_live_read_token_alpha_secret_xyz123";
+  const rawTokenBeta = "crux_live_read_token_beta_secret_uvw456";
+  const hashedAlpha = hashToken(rawTokenAlpha);
+  assert(typeof hashedAlpha === "string" && hashedAlpha.length === 64, "Token hashes correctly to 64-char SHA-256 hex");
+  assert(hashedAlpha === hashToken(rawTokenAlpha), "Token hashing is deterministic");
+  assert(hashedAlpha !== hashToken(rawTokenBeta), "Different tokens yield different SHA-256 hashes");
+
+  let emptyHashRejected = false;
+  try {
+    hashToken("  ");
+  } catch {
+    emptyHashRejected = true;
+  }
+  assert(emptyHashRejected, "Empty or whitespace-only token is rejected by hashToken");
+
+  // 2. Token extraction from HTTP context
+  const mockCtxBearer = { request: { header: (k) => (k.toLowerCase() === "authorization" ? `Bearer ${rawTokenAlpha}` : null) } };
+  assert(extractTokenFromRequest(mockCtxBearer) === rawTokenAlpha, "Bearer token extracted correctly from Authorization header");
+
+  const mockCtxQuery = { request: { query: (k) => (k === "token" ? rawTokenBeta : null) } };
+  assert(extractTokenFromRequest(mockCtxQuery) === rawTokenBeta, "Token extracted correctly from query parameter ?token=...");
+
+  const mockCtxMalformed = { request: { header: () => "Basic dXNlcjpwYXNz" } };
+  assert(extractTokenFromRequest(mockCtxMalformed) === null, "Malformed non-Bearer Authorization header returns null");
+
+  const mockCtxEmpty = { request: {} };
+  assert(extractTokenFromRequest(mockCtxEmpty) === null, "Missing authentication returns null safely");
+
+  // 3. MockTokenAuthenticator: token registration, lookup, revocation
+  const authenticator = new MockTokenAuthenticator();
+  const regAlpha = authenticator.registerToken({
+    accountId: "account-alpha",
+    projectId: "project-alpha",
+    plaintextToken: rawTokenAlpha,
+  });
+  assert(Boolean(regAlpha.tokenHash), "Token registered, returning tokenHash");
+
+  // Verify plaintext token is NEVER stored in authenticator state
+  const storedEntry = authenticator.tokenStore.get(hashedAlpha);
+  assert(storedEntry && !("plaintextToken" in storedEntry) && !("token" in storedEntry), "Plaintext token is NEVER stored in database/store");
+  assert(storedEntry.tokenHash === hashedAlpha, "Store retains only SHA-256 token_hash");
+
+  // 4. Valid token resolution
+  const resolvedAlpha = await authenticator.resolveTokenIdentity(rawTokenAlpha);
+  assert(resolvedAlpha.accountId === "account-alpha", "Token resolves to correct account_id");
+  assert(resolvedAlpha.projectId === "project-alpha", "Token resolves to correct project_id");
+
+  // 5. Invalid / Unknown token rejection
+  let invalidRejected = false;
+  try {
+    await authenticator.resolveTokenIdentity("crux_invalid_unknown_token_999");
+  } catch (err) {
+    invalidRejected = err.message.includes("Unauthorized");
+  }
+  assert(invalidRejected, "Invalid or unknown token is rejected with Unauthorized error");
+
+  // 6. Missing / empty token rejection
+  let missingRejected = false;
+  try {
+    await authenticator.resolveTokenIdentity("");
+  } catch (err) {
+    missingRejected = err.message.includes("Unauthorized");
+  }
+  assert(missingRejected, "Empty token is rejected with Unauthorized error");
+
+  // 7. Revocation verification
+  authenticator.revokeToken(rawTokenAlpha);
+  let revokedRejected = false;
+  try {
+    await authenticator.resolveTokenIdentity(rawTokenAlpha);
+  } catch (err) {
+    revokedRejected = err.message.includes("revoked");
+  }
+  assert(revokedRejected, "Revoked token is strictly rejected with revocation message");
+
+  // 8. Multi-Tenant Project Binding & Context Isolation
+  const mockBackend = {
+    async fetchContext({ accountId, projectId }) {
+      if (accountId === "account-alpha" && projectId === "project-alpha") {
+        return {
+          _type: "CruxRemoteContextPayload",
+          project: { id: "project-alpha", name: "Project Alpha" },
+          state: { exists: true, meta: { project_name: "Project Alpha", current_status: "ACTIVE" }, raw: "# State" },
+          tasks: { count: 1, tasks: [{ id: "TASK-A1", title: "Alpha Task", status: "READY" }] },
+          architecture: { content: "# Alpha Architecture" },
+          decisions: [{ id: "ADR-A1", decision: "Alpha ADR" }],
+          active_work: { agents: [] },
+          changelog: { entries: [] },
+          git_status: { branch: "main", isClean: true },
+        };
+      }
+      if (accountId === "account-alpha" && projectId === "project-beta") {
+        return {
+          _type: "CruxRemoteContextPayload",
+          project: { id: "project-beta", name: "Project Beta" },
+          state: { exists: true, meta: { project_name: "Project Beta", current_status: "ACTIVE" }, raw: "# State" },
+          tasks: { count: 1, tasks: [{ id: "TASK-B1", title: "Beta Task", status: "READY" }] },
+          architecture: { content: "# Beta Architecture" },
+          decisions: [{ id: "ADR-B1", decision: "Beta ADR" }],
+          active_work: { agents: [] },
+          changelog: { entries: [] },
+          git_status: { branch: "main", isClean: true },
+        };
+      }
+      return null;
+    }
+  };
+
+  const freshAuth = new MockTokenAuthenticator();
+  freshAuth.registerToken({
+    accountId: "account-alpha",
+    projectId: "project-alpha",
+    plaintextToken: "token_alpha_valid",
+  });
+  freshAuth.registerToken({
+    accountId: "account-alpha",
+    projectId: "project-beta",
+    plaintextToken: "token_beta_valid",
+  });
+
+  const tokenResolver = createTokenResolver(freshAuth, mockBackend);
+
+  const resolvedAlphaContext = await tokenResolver("token_alpha_valid");
+  assert(resolvedAlphaContext.projectId === "project-alpha", "Alpha token resolves strictly to project-alpha");
+  assert(resolvedAlphaContext.provider.getSnapshot().project.name === "Project Alpha", "Provider is bound to Project Alpha snapshot");
+
+  const resolvedBetaContext = await tokenResolver("token_beta_valid");
+  assert(resolvedBetaContext.projectId === "project-beta", "Beta token resolves strictly to project-beta");
+  assert(resolvedBetaContext.provider.getSnapshot().project.name === "Project Beta", "Provider is bound to Project Beta snapshot");
+
+  // 9. Negative Attack Scenarios:
+  // Attack A: LLM passes project_id override in tool call
+  const alphaSnapshotWithOverride = resolvedAlphaContext.provider.getSnapshot({
+    project_id: "project-beta",
+    projectRoot: "/var/secret",
+  });
+  assert(alphaSnapshotWithOverride.project.name === "Project Alpha", "LLM project_id argument cannot override bound project identity");
+
+  // Attack B: LLM searches for tasks claiming another project
+  const alphaTasks = resolvedAlphaContext.provider.getTasks();
+  assert(alphaTasks.tasks.every(t => t.id === "TASK-A1"), "Alpha tasks strictly isolated; zero Beta tasks returned");
+
+  // Attack C: Project A token cannot resolve Project B
+  let crossProjectDenied = false;
+  try {
+    await freshAuth.resolveTokenIdentity("token_nonexistent_cross_project");
+  } catch {
+    crossProjectDenied = true;
+  }
+  assert(crossProjectDenied, "Cross-project token access strictly rejected");
+
+  // 10. All 8 tools verified on bound authenticated provider
+  const p = resolvedAlphaContext.provider;
+  assert(Boolean(p.getSnapshot()), "Auth Tool 1: get_context_snapshot operational");
+  assert(p.getState().exists === true, "Auth Tool 2: get_project_state operational");
+  assert(Array.isArray(p.getTasks().tasks), "Auth Tool 3: get_tasks operational");
+  assert(typeof p.getArchitecture() === "string", "Auth Tool 4: get_architecture operational");
+  assert(Array.isArray(p.getDecisions()), "Auth Tool 5: get_decisions operational");
+  assert(Array.isArray(p.searchContext("Alpha").matches), "Auth Tool 6: search_project_context operational");
+  assert(Array.isArray(p.getRelevantContext({ task_id: "TASK-A1" }).suggested_files), "Auth Tool 7: get_relevant_context operational");
+  assert(typeof p.getGitStatus().branch === "string", "Auth Tool 8: get_git_status operational");
+
+  // 11. End-to-end authenticated MCP server test
+  const secureAdapter = createChatGPTAdapter(null, {
+    tokenResolver,
+    requireAuth: true,
+  });
+  assert(Boolean(secureAdapter), "Authenticated ChatGPT adapter initialized successfully with tokenResolver");
+
   console.log("\n================================================================");
-  console.log(`Phase 4E-B Comprehensive Test Results: ${passed} passed, ${failed} failed`);
+  console.log(`Phase 4E-B / Phase 6 Comprehensive Test Results: ${passed} passed, ${failed} failed`);
   console.log("================================================================\n");
 
   if (failed > 0) {

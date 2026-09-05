@@ -35,8 +35,51 @@ import {
   readFileSafe,
   getContextDir,
   resolveProjectRoot,
-  assertNoSecrets
-} from "@project-context/core";
+  assertNoSecrets,
+  SupabaseContextBackend
+} from "../../src/index.js";
+import { LocalContextProvider, RemoteContextProvider } from "./remote-context-provider.js";
+import {
+  hashToken,
+  extractTokenFromRequest,
+  MockTokenAuthenticator,
+  SupabaseTokenAuthenticator,
+  createTokenResolver,
+} from "./token-authenticator.js";
+
+/**
+ * Returns true if remote Supabase synchronization/authentication is configured.
+ */
+export function isRemoteMode() {
+  return Boolean(
+    process.env.SUPABASE_URL &&
+    (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY)
+  );
+}
+
+/**
+ * Creates a production Supabase token resolver for createChatGPTAdapter.
+ */
+export function createRemoteTokenResolver() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const apiKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY;
+  if (!supabaseUrl || !apiKey) {
+    throw new Error("SUPABASE_URL and SUPABASE_SECRET_KEY are required for remote token resolution.");
+  }
+  const authenticator = new SupabaseTokenAuthenticator({ supabaseUrl, apiKey });
+  const contextBackend = new SupabaseContextBackend({ supabaseUrl, apiKey });
+  return createTokenResolver(authenticator, contextBackend);
+}
+
+export {
+  LocalContextProvider,
+  RemoteContextProvider,
+  hashToken,
+  extractTokenFromRequest,
+  MockTokenAuthenticator,
+  SupabaseTokenAuthenticator,
+  createTokenResolver,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. DETERMINISTIC PROJECT ROOT RESOLUTION
@@ -84,15 +127,44 @@ export function getTargetProjectRoot(cliArgs = process.argv.slice(2)) {
 // 2. SERVER FACTORY (8 CURATED READ TOOLS)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function createChatGPTAdapter(targetProjectRoot, options = {}) {
-  if (!targetProjectRoot || typeof targetProjectRoot !== "string") {
-    throw new Error("Target project root path is required.");
+export function createChatGPTAdapter(targetProjectRootOrProvider, options = {}) {
+  let defaultProvider;
+  let resolvedRoot = null;
+
+  if (typeof targetProjectRootOrProvider === "string") {
+    resolvedRoot = path.resolve(targetProjectRootOrProvider);
+    if (!fs.existsSync(resolvedRoot)) {
+      throw new Error(`Target project root does not exist: '${resolvedRoot}'`);
+    }
+    defaultProvider = new LocalContextProvider(resolvedRoot);
+  } else if (targetProjectRootOrProvider && typeof targetProjectRootOrProvider.getSnapshot === "function") {
+    defaultProvider = targetProjectRootOrProvider;
+  } else if (typeof options.tokenResolver === "function" || isRemoteMode() || options.requireAuth) {
+    defaultProvider = null;
+  } else {
+    throw new Error("Target project root path or valid ContextProvider instance is required.");
   }
 
-  const resolvedRoot = path.resolve(targetProjectRoot);
-  if (!fs.existsSync(resolvedRoot)) {
-    throw new Error(`Target project root does not exist: '${resolvedRoot}'`);
-  }
+  let activeResolver = options.tokenResolver;
+  const getProvider = async (ctx) => {
+    if (!activeResolver && isRemoteMode() && !defaultProvider) {
+      activeResolver = createRemoteTokenResolver();
+    }
+
+    if (typeof activeResolver === "function") {
+      const token = extractTokenFromRequest(ctx);
+      if (token) {
+        const resolved = await activeResolver(token);
+        if (resolved) {
+          return resolved.provider || resolved;
+        }
+        throw new Error("Unauthorized: Invalid project access token.");
+      } else if (options.requireAuth || isRemoteMode()) {
+        throw new Error("Unauthorized: Missing project access token.");
+      }
+    }
+    return defaultProvider;
+  };
 
   const serverConfig = {
     name: "project-context-chatgpt",
@@ -380,316 +452,319 @@ export function createChatGPTAdapter(targetProjectRoot, options = {}) {
       }),
       outputSchema: OUTPUT_SCHEMAS.get_context_snapshot
     },
-    async (args = {}) => {
-      try {
-        const options = {
-          limit: typeof args.limit === "number" ? args.limit : 5,
-          include_git: args.include_git !== false,
-          include_handoffs: args.include_handoffs !== false,
-          include_decisions: args.include_decisions !== false
-        };
-        const snapshot = getContextSnapshot(resolvedRoot, options);
-        return formatResponse(snapshot, "get_context_snapshot");
-      } catch (err) {
-        return formatError(err);
-      }
-    }
-  );
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 2: get_project_state (Authoritative High-Level Status)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_project_state",
-      title: "Get Project State",
-      description:
-        "Returns the authoritative project status snapshot and metadata from .project-context/STATE.md.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {}
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_project_state
-    },
-    async () => {
-      try {
-        const state = readState(resolvedRoot);
-        const payload = {
-          exists: state.exists,
-          meta: state.meta,
-          raw: state.raw
-        };
-        return formatResponse(payload, "get_project_state");
-      } catch (err) {
-        return formatError(err);
-      }
-    }
-  );
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 3: get_tasks (Task Board with Status Filter)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_tasks",
-      title: "Get Tasks",
-      description:
-        "Returns project tasks from .project-context/TASKS.md, optionally filtered by status (BACKLOG, READY, IN_PROGRESS, BLOCKED, COMPLETED, CANCELLED).",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {
-          status: {
-            type: "string",
-            enum: ["BACKLOG", "READY", "IN_PROGRESS", "BLOCKED", "COMPLETED", "CANCELLED"],
-            description: "Optional status filter"
-          },
-          limit: {
-            type: "integer",
-            minimum: 1,
-            maximum: 50,
-            default: 50,
-            description: "Maximum number of tasks to return (1-50, default 50)"
-          }
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const options = {
+            limit: typeof args.limit === "number" ? args.limit : 5,
+            include_git: args.include_git !== false,
+            include_handoffs: args.include_handoffs !== false,
+            include_decisions: args.include_decisions !== false
+          };
+          const snapshot = await provider.getSnapshot(options);
+          return formatResponse(snapshot, "get_context_snapshot");
+        } catch (err) {
+          return formatError(err);
         }
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_tasks
-    },
-    async (args = {}) => {
-      try {
-        const res = readTasks(resolvedRoot, args.status);
-        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 50;
-        const tasks = (res.tasks || []).slice(0, limit);
-        const payload = {
-          count: tasks.length,
-          total_matched: res.tasks.length,
-          status_filter: args.status || "ALL",
-          tasks
-        };
-        return formatResponse(payload, "get_tasks");
-      } catch (err) {
-        return formatError(err);
       }
-    }
-  );
+    );
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 4: get_architecture (System Boundaries & Invariants)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_architecture",
-      title: "Get Architecture",
-      description:
-        "Returns the project architecture specification, system boundaries, and architectural invariants from .project-context/ARCHITECTURE.md.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {}
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_architecture
-    },
-    async () => {
-      try {
-        const archPath = path.join(getContextDir(resolvedRoot), "ARCHITECTURE.md");
-        const raw = readFileSafe(archPath) || "ARCHITECTURE.md not found.";
-        return formatResponse(raw, "get_architecture");
-      } catch (err) {
-        return formatError(err);
-      }
-    }
-  );
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 5: get_decisions (Architectural Decision Records)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_decisions",
-      title: "Get Decisions",
-      description:
-        "Returns Architectural Decision Records (ADRs) from .project-context/DECISIONS.md.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {
-          limit: {
-            type: "integer",
-            minimum: 1,
-            maximum: 50,
-            default: 20,
-            description: "Maximum number of decisions to return (most recent first)"
-          }
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 2: get_project_state (Authoritative High-Level Status)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_project_state",
+        title: "Get Project State",
+        description:
+          "Returns the authoritative project status snapshot and metadata from .project-context/STATE.md.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {}
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_project_state
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const payload = await provider.getState();
+          return formatResponse(payload, "get_project_state");
+        } catch (err) {
+          return formatError(err);
         }
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_decisions
-    },
-    async (args = {}) => {
-      try {
-        const res = readDecisions(resolvedRoot);
-        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 20;
-        const decisions = (res.decisions || []).slice(-limit).reverse();
-        return formatResponse(decisions, "get_decisions");
-      } catch (err) {
-        return formatError(err);
       }
-    }
-  );
+    );
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 6: search_project_context (Full-Text Search Across Context Files)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "search_project_context",
-      title: "Search Project Context",
-      description:
-        "Searches across all .project-context/ markdown files for keywords, concepts, or historical records.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            minLength: 1,
-            maxLength: 200,
-            description: "Keyword or phrase to search for (1-200 characters)"
-          },
-          limit: {
-            type: "integer",
-            minimum: 1,
-            maximum: 50,
-            default: 25,
-            description: "Maximum number of search matches to return (1-50, default 25)"
-          }
-        },
-        required: ["query"]
-      }),
-      outputSchema: OUTPUT_SCHEMAS.search_project_context
-    },
-    async (args = {}) => {
-      try {
-        if (!args.query || typeof args.query !== "string" || args.query.trim() === "") {
-          return formatError(new Error("Search query must not be empty."));
-        }
-        if (args.query.length > 200) {
-          return formatError(new Error("Search query exceeds maximum length of 200 characters."));
-        }
-        const matches = searchProjectContext(resolvedRoot, args.query.trim());
-        const limit = typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 50) : 25;
-        const boundedMatches = matches.slice(0, limit);
-        const payload = {
-          query: args.query.trim(),
-          match_count: boundedMatches.length,
-          total_matches: matches.length,
-          matches: boundedMatches
-        };
-        return formatResponse(payload, "search_project_context");
-      } catch (err) {
-        return formatError(err);
-      }
-    }
-  );
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 7: get_relevant_context (Task/Topic Deterministic Warm Context)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_relevant_context",
-      title: "Get Relevant Context",
-      description:
-        "Computes deterministic, ranked Warm Context for a specific task or query: relevant ADRs, recent changes, completed tasks, and candidate files.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {
-          task_id: {
-            type: "string",
-            maxLength: 50,
-            description: "Optional task identifier e.g. TASK-002"
-          },
-          query: {
-            type: "string",
-            maxLength: 200,
-            description: "Optional topic query or component name"
-          },
-          files: {
-            type: "array",
-            maxItems: 20,
-            items: {
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 3: get_tasks (Task Board with Status Filter)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_tasks",
+        title: "Get Tasks",
+        description:
+          "Returns project tasks from .project-context/TASKS.md, optionally filtered by status (BACKLOG, READY, IN_PROGRESS, BLOCKED, COMPLETED, CANCELLED).",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {
+            status: {
               type: "string",
-              maxLength: 200
+              enum: ["BACKLOG", "READY", "IN_PROGRESS", "BLOCKED", "COMPLETED", "CANCELLED"],
+              description: "Optional status filter"
             },
-            description: "Optional list of relevant files being inspected (max 20)"
-          },
-          limit: {
-            type: "integer",
-            minimum: 1,
-            maximum: 20,
-            default: 5,
-            description: "Maximum items per category (1-20, default 5)"
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 50,
+              default: 50,
+              description: "Maximum number of tasks to return (1-50, default 50)"
+            }
           }
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_tasks
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const payload = await provider.getTasks(args.status, args.limit);
+          return formatResponse(payload, "get_tasks");
+        } catch (err) {
+          return formatError(err);
         }
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_relevant_context
-    },
-    async (args = {}) => {
-      try {
-        const options = {
-          task_id: args.task_id ? String(args.task_id).slice(0, 50) : undefined,
-          query: args.query ? String(args.query).slice(0, 200) : undefined,
-          files: Array.isArray(args.files) ? args.files.slice(0, 20).map(f => String(f).slice(0, 200)) : undefined,
-          limit: typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 20) : 5
-        };
-        const relevant = getRelevantContext(resolvedRoot, options);
-        return formatResponse(relevant, "get_relevant_context");
-      } catch (err) {
-        return formatError(err);
       }
-    }
-  );
+    );
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // TOOL 8: get_git_status (Working Tree Ground Truth)
-  // ───────────────────────────────────────────────────────────────────────────
-  server.tool(
-    {
-      name: "get_git_status",
-      title: "Get Git Status",
-      description:
-        "Returns Git working tree status: current branch, staged modifications, unstaged modifications, and untracked files.",
-      annotations: READ_ONLY_ANNOTATIONS,
-      inputSchema: fromJsonSchema({
-        type: "object",
-        properties: {}
-      }),
-      outputSchema: OUTPUT_SCHEMAS.get_git_status
-    },
-    async () => {
-      try {
-        const status = getGitStatus(resolvedRoot);
-        return formatResponse(status, "get_git_status");
-      } catch (err) {
-        return formatError(err);
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 4: get_architecture (System Boundaries & Invariants)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_architecture",
+        title: "Get Architecture",
+        description:
+          "Returns the project architecture specification, system boundaries, and architectural invariants from .project-context/ARCHITECTURE.md.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {}
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_architecture
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const raw = await provider.getArchitecture();
+          return formatResponse(raw, "get_architecture");
+        } catch (err) {
+          return formatError(err);
+        }
       }
-    }
-  );
+    );
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 5: get_decisions (Architectural Decision Records)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_decisions",
+        title: "Get Decisions",
+        description:
+          "Returns Architectural Decision Records (ADRs) from .project-context/DECISIONS.md.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 50,
+              default: 20,
+              description: "Maximum number of decisions to return (most recent first)"
+            }
+          }
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_decisions
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const decisions = await provider.getDecisions(args.limit);
+          return formatResponse(decisions, "get_decisions");
+        } catch (err) {
+          return formatError(err);
+        }
+      }
+    );
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 6: search_project_context (Full-Text Search Across Context Files)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "search_project_context",
+        title: "Search Project Context",
+        description:
+          "Searches across all .project-context/ markdown files for keywords, concepts, or historical records.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              minLength: 1,
+              maxLength: 200,
+              description: "Keyword or phrase to search for (1-200 characters)"
+            },
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 50,
+              default: 25,
+              description: "Maximum number of search matches to return (1-50, default 25)"
+            }
+          },
+          required: ["query"]
+        }),
+        outputSchema: OUTPUT_SCHEMAS.search_project_context
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          if (!args.query || typeof args.query !== "string" || args.query.trim() === "") {
+            return formatError(new Error("Search query must not be empty."));
+          }
+          if (args.query.length > 200) {
+            return formatError(new Error("Search query exceeds maximum length of 200 characters."));
+          }
+          const provider = await getProvider(ctx);
+          const payload = await provider.searchContext(args.query.trim(), args.limit);
+          return formatResponse(payload, "search_project_context");
+        } catch (err) {
+          return formatError(err);
+        }
+      }
+    );
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 7: get_relevant_context (Task/Topic Deterministic Warm Context)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_relevant_context",
+        title: "Get Relevant Context",
+        description:
+          "Computes deterministic, ranked Warm Context for a specific task or query: relevant ADRs, recent changes, completed tasks, and candidate files.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {
+            task_id: {
+              type: "string",
+              maxLength: 50,
+              description: "Optional task identifier e.g. TASK-002"
+            },
+            query: {
+              type: "string",
+              maxLength: 200,
+              description: "Optional topic query or component name"
+            },
+            files: {
+              type: "array",
+              maxItems: 20,
+              items: {
+                type: "string",
+                maxLength: 200
+              },
+              description: "Optional list of relevant files being inspected (max 20)"
+            },
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 20,
+              default: 5,
+              description: "Maximum items per category (1-20, default 5)"
+            }
+          }
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_relevant_context
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const options = {
+            task_id: args.task_id ? String(args.task_id).slice(0, 50) : undefined,
+            query: args.query ? String(args.query).slice(0, 200) : undefined,
+            files: Array.isArray(args.files) ? args.files.slice(0, 20).map(f => String(f).slice(0, 200)) : undefined,
+            limit: typeof args.limit === "number" ? Math.min(Math.max(1, args.limit), 20) : 5
+          };
+          const provider = await getProvider(ctx);
+          const relevant = await provider.getRelevantContext(options);
+          return formatResponse(relevant, "get_relevant_context");
+        } catch (err) {
+          return formatError(err);
+        }
+      }
+    );
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // TOOL 8: get_git_status (Working Tree Ground Truth)
+    // ───────────────────────────────────────────────────────────────────────────
+    server.tool(
+      {
+        name: "get_git_status",
+        title: "Get Git Status",
+        description:
+          "Returns Git working tree status: current branch, staged modifications, unstaged modifications, and untracked files.",
+        annotations: READ_ONLY_ANNOTATIONS,
+        inputSchema: fromJsonSchema({
+          type: "object",
+          properties: {}
+        }),
+        outputSchema: OUTPUT_SCHEMAS.get_git_status
+      },
+      async (args = {}, ctx = {}) => {
+        try {
+          const provider = await getProvider(ctx);
+          const status = await provider.getGitStatus();
+          return formatResponse(status, "get_git_status");
+        } catch (err) {
+          return formatError(err);
+        }
+      }
+    );
 
   return server;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 3. LOCAL SERVER RUNNER
+// 3. SERVER RUNNER (LOCAL & HOSTED REMOTE)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function startChatGPTAdapter(options = {}) {
-  const targetRoot = options.rootDir || getTargetProjectRoot();
-  const port = options.port !== undefined ? options.port : parseInt(process.env.PORT || "3000", 10);
-  const host = "127.0.0.1"; // Strictly bound to loopback
+  const remote = Boolean(
+    options.tokenResolver ||
+    (isRemoteMode() && !options.rootDir)
+  );
 
-  const server = createChatGPTAdapter(targetRoot, options);
+  const port = options.port !== undefined ? options.port : parseInt(process.env.PORT || "3000", 10);
+  const host = options.host || (remote ? (process.env.HOST || "0.0.0.0") : "127.0.0.1");
+
+  let server;
+  let targetRoot = null;
+
+  if (remote) {
+    const tokenResolver = options.tokenResolver || createRemoteTokenResolver();
+    server = createChatGPTAdapter(null, {
+      tokenResolver,
+      requireAuth: options.requireAuth !== false,
+      allowedHosts: options.allowedHosts || process.env.ALLOWED_HOSTS,
+      ...options,
+    });
+  } else {
+    targetRoot = options.rootDir || getTargetProjectRoot();
+    server = createChatGPTAdapter(targetRoot, options);
+  }
+
   const running = await server.listen(port, { host });
 
   return {
@@ -703,13 +778,21 @@ export async function startChatGPTAdapter(options = {}) {
 // Direct CLI execution
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    const targetRoot = getTargetProjectRoot();
-    console.log(`[Project Context OS] Target Project Root: ${targetRoot}`);
-    console.log("[Project Context OS] Authentication: No Auth (Streamable HTTP / ChatGPT Web)");
-    const { port, url } = await startChatGPTAdapter({ rootDir: targetRoot });
-    console.log(`[Project Context OS] ChatGPT MCP Adapter running on ${url} (port ${port})`);
-    console.log(`[Project Context OS] Streamable HTTP endpoint: ${url}`);
-    console.log(`[Project Context OS] Local Inspector: http://localhost:${port}/mcp/inspector`);
+    const remote = isRemoteMode() && !process.env.PROJECT_CONTEXT_ROOT && !process.argv.includes("--root");
+    if (remote) {
+      console.log("[Project Context OS] Starting hosted remote Crux MCP adapter (Supabase token-bound)...");
+      const { port, url } = await startChatGPTAdapter();
+      console.log(`[Project Context OS] Hosted Crux MCP running on ${url} (port ${port})`);
+      console.log(`[Project Context OS] Streamable HTTP endpoint: ${url}`);
+    } else {
+      const targetRoot = getTargetProjectRoot();
+      console.log(`[Project Context OS] Target Project Root: ${targetRoot}`);
+      console.log("[Project Context OS] Authentication: No Auth (Streamable HTTP / ChatGPT Web)");
+      const { port, url } = await startChatGPTAdapter({ rootDir: targetRoot });
+      console.log(`[Project Context OS] ChatGPT MCP Adapter running on ${url} (port ${port})`);
+      console.log(`[Project Context OS] Streamable HTTP endpoint: ${url}`);
+      console.log(`[Project Context OS] Local Inspector: http://localhost:${port}/mcp/inspector`);
+    }
   } catch (err) {
     console.error(`[FATAL] Failed to start adapter: ${err.message}`);
     process.exit(1);
@@ -721,12 +804,25 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
 let defaultServerInstance = null;
 export default (() => {
   if (!defaultServerInstance) {
-    try {
-      const root = getTargetProjectRoot();
-      defaultServerInstance = createChatGPTAdapter(root);
-    } catch {
-      // In isolated environments or build time, lazily permit fallback
-      defaultServerInstance = createChatGPTAdapter(process.cwd());
+    const remote = isRemoteMode() && !process.env.PROJECT_CONTEXT_ROOT && !process.argv.includes("--root");
+    if (remote) {
+      const tokenResolver = createRemoteTokenResolver();
+      defaultServerInstance = createChatGPTAdapter(null, {
+        tokenResolver,
+        requireAuth: true,
+        allowedHosts: process.env.ALLOWED_HOSTS,
+      });
+    } else {
+      try {
+        const root = getTargetProjectRoot();
+        defaultServerInstance = createChatGPTAdapter(root);
+      } catch {
+        // In isolated environments or build time, lazily permit fallback
+        defaultServerInstance = createChatGPTAdapter(null, {
+          requireAuth: true,
+          allowedHosts: process.env.ALLOWED_HOSTS,
+        });
+      }
     }
   }
   return defaultServerInstance;

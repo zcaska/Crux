@@ -1,0 +1,276 @@
+- generic [active] [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e229]:
+      - generic [ref=f1e230]:
+        - generic [ref=f1e231]:
+          - link [ref=f1e233] [cursor=pointer]:
+            - /url: /cloud/organizations
+            - heading "Manufact" [level=2] [ref=f1e246]
+          - generic [ref=f1e247]: /
+          - button "Anurag Pandey's Projects" [ref=f1e248]:
+            - generic [ref=f1e249] [cursor=pointer]:
+              - generic [ref=f1e254]: Anurag Pandey's Projects
+              - generic [aria-hidden] [ref=f1e372]: FREE
+          - generic [ref=f1e258]: /
+          - button "crux-mcp" [ref=f1e490]
+          - generic [ref=f1e495]: /
+          - 'button "Environment: main" [ref=f1e498] [cursor=pointer]':
+            - generic [ref=f1e503]:
+              - generic [ref=f1e504]: main
+              - generic "Running" [ref=f1e506]
+          - button "bold-forge-qu960.run.mcp-use.com/mcp" [ref=f1e514]
+        - generic [ref=f1e264]:
+          - navigation [ref=f1e265]:
+            - link [ref=f1e266] [cursor=pointer]:
+              - /url: https://github.com/mcp-use/mcp-use
+              - button "10.6k" [ref=f1e267]
+            - link "Discord" [ref=f1e269] [cursor=pointer]:
+              - /url: https://discord.gg/XkNkSkMz3V
+            - button "Docs" [ref=f1e270] [cursor=pointer]
+            - 'combobox "Theme: Auto" [ref=f1e272] [cursor=pointer]':
+              - generic [ref=f1e275]: System
+          - button [ref=f1e383] [cursor=pointer]:
+            - img "Anurag Pandey" [ref=f1e384]
+      - generic [ref=f1e281]:
+        - generic [ref=f1e285]:
+          - generic [ref=f1e287]:
+            - generic [ref=f1e520]:
+              - list [ref=f1e522]:
+                - listitem [ref=f1e523]:
+                  - link "Back to Org" [ref=f1e524] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/dashboard
+                - listitem [ref=f1e529]:
+                  - link "Overview" [ref=f1e530] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/overview
+                - listitem [ref=f1e537]:
+                  - link "Chat" [ref=f1e538] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/chat
+              - generic [ref=f1e542]:
+                - generic [ref=f1e543]: Primitives
+                - list [ref=f1e545]:
+                  - listitem [ref=f1e546]:
+                    - link "Tools" [ref=f1e547] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/tools
+                    - generic [ref=f1e551]: "8"
+                  - listitem [ref=f1e553]:
+                    - link "Prompts" [ref=f1e554] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/prompts
+                    - generic [ref=f1e559]: "0"
+                  - listitem [ref=f1e561]:
+                    - link "Resources" [ref=f1e562] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/resources
+                    - generic [ref=f1e567]: "0"
+              - generic [ref=f1e569]:
+                - generic [ref=f1e570]: Deployments
+                - list [ref=f1e572]:
+                  - listitem [ref=f1e573]:
+                    - link "Deployments" [ref=f1e574] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/deployments
+                  - listitem [ref=f1e581]:
+                    - link "Environment Variables" [ref=f1e582] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/environment-variables
+                  - listitem [ref=f1e589]:
+                    - link "Network Requests" [ref=f1e590] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/observability
+              - generic [ref=f1e594]:
+                - generic [ref=f1e595]: Analytics
+                - list [ref=f1e597]:
+                  - listitem [ref=f1e598]:
+                    - link "Analytics" [ref=f1e599] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/analytics
+                  - listitem [ref=f1e603]:
+                    - link "Sessions" [ref=f1e604] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/sessions
+                  - listitem [ref=f1e610]:
+                    - link "Feedback" [ref=f1e611] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/feedback
+              - generic [ref=f1e615]:
+                - generic [ref=f1e616]: Testing
+                - list [ref=f1e618]:
+                  - listitem [ref=f1e619]:
+                    - link "Testing" [ref=f1e620] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/evals/suites
+              - generic [ref=f1e624]:
+                - generic [ref=f1e625]: Publish
+                - list [ref=f1e627]:
+                  - listitem [ref=f1e628]:
+                    - link "Public Chat" [ref=f1e629] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/public-chat
+                  - listitem [ref=f1e633]:
+                    - link "Checklist" [ref=f1e634] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/checklist
+                  - listitem [ref=f1e639]:
+                    - link "Submission pack" [ref=f1e640] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/submission-pack
+              - generic [ref=f1e647]:
+                - generic [ref=f1e648]: Settings
+                - list [ref=f1e650]:
+                  - listitem [ref=f1e651]:
+                    - link "Domains" [ref=f1e652] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/domains
+                  - listitem [ref=f1e657]:
+                    - link "Settings" [ref=f1e658] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/settings
+            - button "Scroll sidebar up"
+            - button "Scroll sidebar down" [ref=f1e403] [cursor=pointer]
+          - generic [ref=f1e408]:
+            - generic [ref=f1e409]:
+              - heading "Upgrade your plan" [level=4] [ref=f1e410]
+              - button "Dismiss upgrade prompt" [ref=f1e411] [cursor=pointer]
+            - paragraph [ref=f1e412]: Unlock additional team members, projects, and higher server count on the Hobby and Startup plans.
+            - generic [ref=f1e413]:
+              - link "Compare plans" [ref=f1e414] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing
+              - link "Upgrade" [ref=f1e415] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing?plan=hobby
+          - button "Collapse sidebar" [ref=f1e367] [cursor=pointer]
+        - generic [ref=f1e666]:
+          - generic [ref=f1e675]:
+            - heading "crux-mcp" [level=1] [ref=f1e676]
+            - generic [ref=f1e679]: No description
+          - generic [ref=f1e684]:
+            - generic [ref=f1e685]:
+              - generic [ref=f1e686]:
+                - link "Tools 8" [ref=f1e687] [cursor=pointer]:
+                  - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/tools
+                  - generic [ref=f1e688]:
+                    - generic [ref=f1e689]: Tools
+                    - generic [ref=f1e695]: "8"
+                - link "Prompts 0" [ref=f1e697] [cursor=pointer]:
+                  - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/prompts
+                  - generic [ref=f1e698]:
+                    - generic [ref=f1e699]: Prompts
+                    - generic [ref=f1e705]: "0"
+                - link "Resources 0" [ref=f1e707] [cursor=pointer]:
+                  - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/resources
+                  - generic [ref=f1e708]:
+                    - generic [ref=f1e709]: Resources
+                    - generic [ref=f1e715]: "0"
+                - link "Gateway Requests Events over last 7 days" [ref=f1e717] [cursor=pointer]:
+                  - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/observability
+                  - generic [ref=f1e718]:
+                    - generic [ref=f1e721]:
+                      - generic [ref=f1e722]: Gateway Requests
+                      - generic [ref=f1e723]: Events over last 7 days
+                    - application [ref=f1e732]
+              - generic [ref=f1e739]:
+                - generic [ref=f1e740]:
+                  - generic [ref=f1e742]:
+                    - generic [ref=f1e743]:
+                      - generic [ref=f1e744]: Tools Usage
+                      - generic [ref=f1e745]:
+                        - button [ref=f1e746]
+                        - button [ref=f1e750]
+                        - button [ref=f1e753]
+                        - button [ref=f1e756]
+                    - link "Analytics" [ref=f1e761] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/analytics
+                  - generic [ref=f1e767]:
+                    - application [ref=f1e772]:
+                      - generic [ref=f1e813]:
+                        - generic [ref=f1e814]:
+                          - generic [ref=f1e815]: Aug 30
+                          - generic [ref=f1e817]: Aug 31
+                          - generic [ref=f1e819]: Sep 1
+                          - generic [ref=f1e821]: Sep 2
+                          - generic [ref=f1e823]: Sep 3
+                          - generic [ref=f1e825]: Sep 4
+                          - generic [ref=f1e827]: Sep 5
+                        - generic [ref=f1e829]:
+                          - generic [ref=f1e830]: "0"
+                          - generic [ref=f1e832]: "15"
+                          - generic [ref=f1e834]: "30"
+                          - generic [ref=f1e836]: "45"
+                          - generic [ref=f1e838]: "60"
+                        - generic [ref=f1e840]: Calls
+                    - generic [ref=f1e841]:
+                      - generic "get_project_state" [ref=f1e844]
+                      - generic "get_context_snapshot" [ref=f1e847]
+                      - generic "get_tasks" [ref=f1e850]
+                      - generic "get_architecture" [ref=f1e853]
+                      - generic "get_decisions" [ref=f1e856]
+                      - generic "Other" [ref=f1e859]
+                - generic [ref=f1e861]:
+                  - generic [ref=f1e863]:
+                    - generic [ref=f1e864]:
+                      - generic [ref=f1e865]: Active Deployment
+                      - generic [ref=f1e866]:
+                        - text: "Deployment #5"
+                        - generic [ref=f1e867]: ·
+                        - generic [ref=f1e870]: 0c89d52
+                      - generic [ref=f1e871]: Sep 5, 2026 at 2:59 PM
+                    - link "Deployments" [ref=f1e872] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/deployments
+                  - 'link "POST /mcp 202 2ms GET /mcp 204 0ms tools/call get_context_snapshot /mcp 200 client=unknown 654ms ERROR Error: Unauthorized: Authentication lookup failed. initialize test/1.0.0 /mcp 200 client=test/1.0.0 2ms POST /mcp 202 1ms GET /mcp 204 0ms tools/call get_context_snapshot /mcp 200 client=unknown 255ms ERROR Error: Unauthorized: Authentication lookup failed. GET /mcp 204 0ms GET / 404 1ms GET /favicon.png 404 0ms" [ref=f1e876] [cursor=pointer]':
+                    - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/logs
+                    - generic [ref=f1e881]:
+                      - generic [ref=f1e883]:
+                        - generic [aria-hidden] [ref=f1e885]: i
+                        - generic [ref=f1e886]: POST /mcp 202 2ms
+                      - generic [ref=f1e888]:
+                        - generic [aria-hidden] [ref=f1e890]: i
+                        - generic [ref=f1e891]: GET /mcp 204 0ms
+                      - generic [ref=f1e893]:
+                        - generic [aria-hidden] [ref=f1e895]: i
+                        - generic [ref=f1e896]: "tools/call get_context_snapshot /mcp 200 client=unknown 654ms ERROR Error: Unauthorized: Authentication lookup failed."
+                      - generic [ref=f1e898]:
+                        - generic [aria-hidden] [ref=f1e900]: i
+                        - generic [ref=f1e901]: initialize test/1.0.0 /mcp 200 client=test/1.0.0 2ms
+                      - generic [ref=f1e903]:
+                        - generic [aria-hidden] [ref=f1e905]: i
+                        - generic [ref=f1e906]: POST /mcp 202 1ms
+                      - generic [ref=f1e908]:
+                        - generic [aria-hidden] [ref=f1e910]: i
+                        - generic [ref=f1e911]: GET /mcp 204 0ms
+                      - generic [ref=f1e913]:
+                        - generic [aria-hidden] [ref=f1e915]: i
+                        - generic [ref=f1e916]: "tools/call get_context_snapshot /mcp 200 client=unknown 255ms ERROR Error: Unauthorized: Authentication lookup failed."
+                      - generic [ref=f1e918]:
+                        - generic [aria-hidden] [ref=f1e920]: i
+                        - generic [ref=f1e921]: GET /mcp 204 0ms
+                      - generic [ref=f1e923]:
+                        - generic [aria-hidden] [ref=f1e925]: i
+                        - generic [ref=f1e926]: GET / 404 1ms
+                      - generic [ref=f1e928]:
+                        - generic [aria-hidden] [ref=f1e930]: i
+                        - generic [ref=f1e931]: GET /favicon.png 404 0ms
+            - generic [ref=f1e932]:
+              - generic [ref=f1e933]:
+                - generic [ref=f1e935]:
+                  - text: Server Information
+                  - button "Server Information" [ref=f1e936]
+                - generic [ref=f1e939]:
+                  - text: Title
+                  - generic [ref=f1e940]: No title
+                - generic [ref=f1e942]:
+                  - text: Region
+                  - generic [ref=f1e943]:
+                    - img "Auto" [ref=f1e944]
+                    - generic [ref=f1e947]: AUTO
+                - generic [ref=f1e948]:
+                  - text: Name
+                  - generic [ref=f1e949]: project-context-chatgpt
+                - generic [ref=f1e951]:
+                  - text: Version
+                  - generic [ref=f1e952]: 1.0.0
+                - generic [ref=f1e954]:
+                  - text: Website URL
+                  - generic [ref=f1e955]: —
+              - generic [ref=f1e956]:
+                - generic [ref=f1e957]: Active Deployment
+                - generic [ref=f1e958]:
+                  - generic [ref=f1e961]: 0c89d52
+                  - generic "Redeploy from mcp-use CLI" [ref=f1e962]
+              - generic [ref=f1e963]:
+                - generic [ref=f1e964]: Connection Status
+                - generic [ref=f1e966]:
+                  - generic "Connected" [ref=f1e967]
+                  - generic [ref=f1e969]: Connected
+              - generic [ref=f1e970]:
+                - generic [ref=f1e971]: Tags
+                - generic [ref=f1e972]: Add tag
+  - alert [ref=f1e63]: crux-mcp · Overview
+  - iframe [aria-hidden] [ref=f1e107]
+  - button "Open Intercom Messenger" [ref=f1e108] [cursor=pointer]
+  - generic [aria-hidden] [ref=f1e976]: "0"

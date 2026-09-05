@@ -1,0 +1,43 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+          - /url: /
+          - heading "Manufact" [level=2] [ref=e17]
+        - link [ref=e18] [cursor=pointer]:
+          - /url: /book-call
+          - button "Book a call" [ref=e20]
+      - generic [ref=e32]:
+        - generic [ref=e35]:
+          - heading "Log in or sign up" [level=1] [ref=e37]
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - text: Email
+              - textbox "Email" [ref=e40]:
+                - /placeholder: Enter your email
+            - button "Continue" [ref=e41] [cursor=pointer]
+          - generic [ref=e43]: Or continue with
+          - generic [ref=e47]:
+            - button "Google" [ref=e48] [cursor=pointer]
+            - button "GitHub" [ref=e50] [cursor=pointer]
+          - paragraph [ref=e52]:
+            - text: By continuing, you agree to our
+            - link "TOS" [ref=e53] [cursor=pointer]:
+              - /url: /terms
+            - text: and
+            - link "Privacy" [ref=e54] [cursor=pointer]:
+              - /url: /privacy
+        - complementary [ref=e55]:
+          - heading "All-in-one MCP platform" [level=2] [ref=e56]
+          - paragraph [ref=e57]: Manufact is the complete platform to build, deploy and distribute MCP servers, Claude connectors and ChatGPT apps.
+          - list [ref=e58]:
+            - listitem [ref=e59]: Hosting
+            - listitem [ref=e63]: Evaluations
+            - listitem [ref=e67]: Publishing checks
+            - listitem [ref=e71]: Submission pack
+            - listitem [ref=e75]: Cloud Inspector
+            - listitem [ref=e79]: Public chat
+            - listitem [ref=e83]: Analytics
+  - alert [ref=e87]

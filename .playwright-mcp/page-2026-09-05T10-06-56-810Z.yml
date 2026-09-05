@@ -1,0 +1,130 @@
+- generic [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e229]:
+      - generic [ref=f1e230]:
+        - generic [ref=f1e231]:
+          - link [ref=f1e233] [cursor=pointer]:
+            - /url: /cloud/organizations
+            - heading "Manufact" [level=2] [ref=f1e246]
+          - generic [ref=f1e247]: /
+          - button "Anurag Pandey's Projects" [ref=f1e248]:
+            - generic [ref=f1e249] [cursor=pointer]:
+              - generic [ref=f1e254]: Anurag Pandey's Projects
+              - generic [aria-hidden] [ref=f1e372]: FREE
+          - generic [ref=f1e258]: /
+          - button "Dashboard" [ref=f1e373]
+        - generic [ref=f1e264]:
+          - navigation [ref=f1e265]:
+            - link [ref=f1e266] [cursor=pointer]:
+              - /url: https://github.com/mcp-use/mcp-use
+              - button "10.6k" [ref=f1e267]
+            - link "Discord" [ref=f1e269] [cursor=pointer]:
+              - /url: https://discord.gg/XkNkSkMz3V
+            - button "Docs" [ref=f1e270] [cursor=pointer]
+            - 'combobox "Theme: Auto" [ref=f1e272] [cursor=pointer]':
+              - generic [ref=f1e275]: System
+          - button [ref=f1e383] [cursor=pointer]:
+            - img "Anurag Pandey" [ref=f1e384]
+      - generic [ref=f1e281]:
+        - generic [ref=f1e285]:
+          - generic [ref=f1e287]:
+            - generic [ref=f1e291]:
+              - list [ref=f1e293]:
+                - listitem [ref=f1e294]:
+                  - link "Back to all organizations" [ref=f1e295] [cursor=pointer]:
+                    - /url: /cloud/organizations
+                - listitem [ref=f1e300]:
+                  - link "Dashboard" [ref=f1e301] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/dashboard
+              - generic [ref=f1e306]:
+                - generic [ref=f1e307]:
+                  - generic [ref=f1e308]: Servers
+                  - link "Create server" [ref=f1e386] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers/new
+                - list [ref=f1e309]:
+                  - listitem [ref=f1e310]:
+                    - link "Servers" [active] [ref=f1e311] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers
+                    - generic [ref=f1e324]: "1"
+              - generic [ref=f1e326]:
+                - generic [ref=f1e327]: Recent
+                - list [ref=f1e328]:
+                  - listitem [ref=f1e388]:
+                    - link "crux-mcp" [ref=f1e389] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/servers/8dfd5fa8-1e22-460c-ad04-9c46890f0c74/overview
+                    - generic "Server is running." [ref=f1e396]
+              - generic [ref=f1e335]:
+                - generic [ref=f1e336]: Admin
+                - list [ref=f1e338]:
+                  - listitem [ref=f1e339]:
+                    - link "Org settings" [ref=f1e340] [cursor=pointer]:
+                      - /url: /cloud/organizations/0ac34d0b-1fe3-4caa-a3ad-13670e9b743d
+                  - listitem [ref=f1e345]:
+                    - link "Team" [ref=f1e346] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/team
+                  - listitem [ref=f1e353]:
+                    - link "Integrations" [ref=f1e354] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/integrations
+                  - listitem [ref=f1e360]:
+                    - link "API Keys" [ref=f1e361] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/apikeys
+                  - listitem [ref=f1e398]:
+                    - link "Billing" [ref=f1e399] [cursor=pointer]:
+                      - /url: /cloud/org-6f280a88-vyy84/billing
+            - button "Scroll sidebar up"
+            - button "Scroll sidebar down" [ref=f1e403] [cursor=pointer]
+          - generic [ref=f1e408]:
+            - generic [ref=f1e409]:
+              - heading "Upgrade your plan" [level=4] [ref=f1e410]
+              - button "Dismiss upgrade prompt" [ref=f1e411] [cursor=pointer]
+            - paragraph [ref=f1e412]: Unlock additional team members, projects, and higher server count on the Hobby and Startup plans.
+            - generic [ref=f1e413]:
+              - link "Compare plans" [ref=f1e414] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing
+              - link "Upgrade" [ref=f1e415] [cursor=pointer]:
+                - /url: /cloud/org-6f280a88-vyy84/billing?plan=hobby
+          - button "Collapse sidebar" [ref=f1e367] [cursor=pointer]
+        - generic [ref=f1e418]:
+          - generic [ref=f1e420]:
+            - generic [ref=f1e422]:
+              - heading "Servers" [level=2] [ref=f1e423]
+              - paragraph [ref=f1e424]: Manage your connected MCP servers
+            - link [ref=f1e427] [cursor=pointer]:
+              - /url: /cloud/org-6f280a88-vyy84/servers/new
+              - button "New Server" [ref=f1e428]
+          - generic [ref=f1e429]:
+            - textbox "Search servers..." [ref=f1e432]
+            - table [ref=f1e436]:
+              - rowgroup [ref=f1e437]:
+                - row [ref=f1e438]:
+                  - columnheader [ref=f1e439]:
+                    - checkbox "Select all servers" [ref=f1e440]
+                  - columnheader "Name" [ref=f1e441] [cursor=pointer]
+                  - columnheader "Description" [ref=f1e443] [cursor=pointer]
+                  - columnheader "Tags" [ref=f1e445]
+                  - columnheader "Status" [ref=f1e446]
+                  - columnheader "Region" [ref=f1e447]
+                  - columnheader "URL" [ref=f1e448]
+                  - columnheader "Created" [ref=f1e449] [cursor=pointer]
+                  - columnheader [ref=f1e453]
+              - rowgroup [ref=f1e454]:
+                - row [ref=f1e455] [cursor=pointer]:
+                  - cell [ref=f1e456]:
+                    - checkbox "Select crux-mcp" [ref=f1e457]
+                  - cell "crux-mcp" [ref=f1e458]
+                  - cell "No description" [ref=f1e465]
+                  - cell "No tags" [ref=f1e467]
+                  - cell "Running" [ref=f1e470]
+                  - cell "Auto Auto" [ref=f1e472]:
+                    - generic [ref=f1e473]:
+                      - img "Auto" [ref=f1e474]
+                      - generic [ref=f1e477]: Auto
+                  - cell [ref=f1e478]:
+                    - button "bold-forge-qu960.run.mcp-use.com/mcp" [ref=f1e479]
+                  - cell "an hour ago" [ref=f1e484]
+                  - cell [ref=f1e485]:
+                    - button "Delete server" [ref=f1e486]
+  - alert [ref=f1e63]: Servers · Manufact
+  - iframe [aria-hidden] [ref=f1e107]
+  - button "Open Intercom Messenger" [ref=f1e108] [cursor=pointer]

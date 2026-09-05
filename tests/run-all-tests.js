@@ -54,6 +54,7 @@ import { runModelInteropTests } from "./model-interop.test.js";
 import { runTokenEfficiencyTests } from "./token-efficiency.test.js";
 import { runDecouplingTests } from "./decoupling.test.js";
 import { runAdversarialPhase5Tests } from "./adversarial-phase5.test.js";
+import { runRemoteSyncTests } from "./remote-sync.test.js";
 import { runCleanRoomDistributionGate } from "./clean-room-gate.test.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -592,7 +593,12 @@ async function runTests() {
   await runAdversarialPhase5Tests(rootDir, assert);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // TEST GROUP 23: Phase 5G Clean-Room Release Distribution Gate
+  // TEST GROUP 23: Phase 6 Remote Context Synchronization
+  // ─────────────────────────────────────────────────────────────────────────
+  await runRemoteSyncTests(rootDir, assert);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEST GROUP 24: Phase 5G/6 Clean-Room Release Distribution Gate
   // ─────────────────────────────────────────────────────────────────────────
   await runCleanRoomDistributionGate(assert);
 

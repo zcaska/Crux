@@ -24,4 +24,5 @@ export * from "./relevance.js";
 export * from "./quality.js";
 export * from "./drift.js";
 export * from "./graphify.js";
+export * from "./sync.js";
 export { createProjectContextMcpServer } from "./mcp-server.js";

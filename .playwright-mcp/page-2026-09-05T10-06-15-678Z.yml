@@ -1,0 +1,28 @@
+- generic [active] [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - heading "Manufact" [level=2] [ref=f1e18]
+        - img "Loading" [ref=f1e20]
+      - generic [ref=f1e22]:
+        - generic [ref=f1e23]:
+          - link [ref=f1e25] [cursor=pointer]:
+            - /url: /cloud/organizations
+            - heading "Manufact" [level=2] [ref=f1e38]
+          - generic [ref=f1e39]: /
+          - button [disabled] [ref=f1e40]:
+            - generic [ref=f1e41] [cursor=pointer]
+        - generic [ref=f1e46]:
+          - navigation [ref=f1e47]:
+            - link [ref=f1e48] [cursor=pointer]:
+              - /url: https://github.com/mcp-use/mcp-use
+              - button "10.6k" [ref=f1e49]
+            - link "Discord" [ref=f1e51] [cursor=pointer]:
+              - /url: https://discord.gg/XkNkSkMz3V
+            - button "Docs" [ref=f1e52] [cursor=pointer]
+            - 'combobox "Theme: Auto" [ref=f1e54] [cursor=pointer]':
+              - generic [ref=f1e57]: System
+          - generic "Loading account" [ref=f1e58]
+      - img "Loading" [ref=f1e61]
+  - alert [ref=f1e63]

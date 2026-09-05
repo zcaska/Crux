@@ -1,0 +1,69 @@
+- generic [active] [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e229]:
+      - generic [ref=f1e230]:
+        - generic [ref=f1e231]:
+          - link [ref=f1e233] [cursor=pointer]:
+            - /url: /cloud/organizations
+            - heading "Manufact" [level=2] [ref=f1e246]
+          - generic [ref=f1e247]: /
+          - button "Anurag Pandey's Projects" [ref=f1e248]
+          - generic [ref=f1e258]: /
+          - generic [ref=f1e259] [cursor=pointer]
+        - generic [ref=f1e264]:
+          - navigation [ref=f1e265]:
+            - link [ref=f1e266] [cursor=pointer]:
+              - /url: https://github.com/mcp-use/mcp-use
+              - button "10.6k" [ref=f1e267]
+            - link "Discord" [ref=f1e269] [cursor=pointer]:
+              - /url: https://discord.gg/XkNkSkMz3V
+            - button "Docs" [ref=f1e270] [cursor=pointer]
+            - 'combobox "Theme: Auto" [ref=f1e272] [cursor=pointer]':
+              - generic [ref=f1e275]: System
+          - button "A" [ref=f1e277] [cursor=pointer]
+      - generic [ref=f1e285]:
+        - generic [ref=f1e287]:
+          - generic [ref=f1e291]:
+            - list [ref=f1e293]:
+              - listitem [ref=f1e294]:
+                - link "Back to all organizations" [ref=f1e295] [cursor=pointer]:
+                  - /url: /cloud/organizations
+              - listitem [ref=f1e300]:
+                - link "Dashboard" [ref=f1e301] [cursor=pointer]:
+                  - /url: /cloud/org-6f280a88-vyy84/dashboard
+            - generic [ref=f1e306]:
+              - generic [ref=f1e307]:
+                - generic [ref=f1e308]: Servers
+                - generic:
+                  - link "Create server":
+                    - /url: /cloud/org-6f280a88-vyy84/servers/new
+              - list [ref=f1e309]:
+                - listitem [ref=f1e310]:
+                  - link "Servers" [ref=f1e311] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/servers
+            - generic [ref=f1e326]:
+              - generic [ref=f1e327]: Recent
+              - list [ref=f1e328]:
+                - listitem [ref=f1e329]
+            - generic [ref=f1e335]:
+              - generic [ref=f1e336]: Admin
+              - list [ref=f1e338]:
+                - listitem [ref=f1e339]:
+                  - link "Org settings" [ref=f1e340] [cursor=pointer]:
+                    - /url: /cloud/organizations/0ac34d0b-1fe3-4caa-a3ad-13670e9b743d
+                - listitem [ref=f1e345]:
+                  - link "Team" [ref=f1e346] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/team
+                - listitem [ref=f1e353]:
+                  - link "Integrations" [ref=f1e354] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/integrations
+                - listitem [ref=f1e360]:
+                  - link "API Keys" [ref=f1e361] [cursor=pointer]:
+                    - /url: /cloud/org-6f280a88-vyy84/apikeys
+          - button "Scroll sidebar up"
+          - button "Scroll sidebar down"
+        - button "Collapse sidebar" [ref=f1e367] [cursor=pointer]
+  - alert [ref=f1e63]
+  - iframe [aria-hidden] [ref=f1e107]
+  - button "Open Intercom Messenger" [ref=f1e108] [cursor=pointer]

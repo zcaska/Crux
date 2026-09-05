@@ -61,6 +61,7 @@ import { checkInvariants } from "../src/invariants.js";
 import { resolveProjectRoot, assertWithinProject } from "../src/locator.js";
 import { initProjectContext } from "../src/init.js";
 import { runDoctor, getProjectDiagnostics } from "../src/doctor.js";
+import { syncProjectContext, getLocalSyncState, assembleRemoteContextPayload } from "../src/sync.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,6 +106,49 @@ function output(data, textFallback) {
 async function run() {
   try {
     switch (command) {
+      // ───────────────────────────────────────────────────────────────────────
+      // PHASE 6 REMOTE SYNCHRONIZATION COMMANDS
+      // ───────────────────────────────────────────────────────────────────────
+
+      case "sync": {
+        const force = Boolean(flags.force);
+        const dryRun = Boolean(flags["dry-run"] || flags.dryRun);
+        const accountId = flags.account || flags["account-id"] || process.env.CRUX_ACCOUNT_ID;
+        const res = await syncProjectContext(rootDir, { force, dryRun, accountId });
+        output(res, () => {
+          let out = `=== Project Context OS Remote Synchronization ===\n`;
+          out += `Project: ${res.project_id} (Version: ${res.sync_version ? res.sync_version.slice(0, 8) : "none"})\n`;
+          out += `Status: ${res.status}\n`;
+          out += `Message: ${res.message}\n`;
+          if (res.synchronized_at) {
+            out += `Timestamp: ${res.synchronized_at}\n`;
+          }
+          if (res.error) {
+            out += `Error: ${res.error}\n`;
+          }
+          return out;
+        });
+        if (res.status === "FAILED") {
+          process.exitCode = 1;
+        }
+        break;
+      }
+
+      case "sync-status": {
+        const status = getLocalSyncState(rootDir);
+        output(status, () => {
+          let out = `=== Project Context OS Sync Status ===\n`;
+          out += `Status: ${status.status}\n`;
+          out += `Sync Version: ${status.sync_version ? status.sync_version.slice(0, 8) : "none"}\n`;
+          out += `Last Synced: ${status.last_synced_at || "never"}\n`;
+          if (status.error) {
+            out += `Last Error: ${status.error}\n`;
+          }
+          return out;
+        });
+        break;
+      }
+
       // ───────────────────────────────────────────────────────────────────────
       // PHASE 4 UNIVERSALIZATION & LIFECYCLE COMMANDS
       // ───────────────────────────────────────────────────────────────────────
@@ -720,8 +764,12 @@ async function run() {
       case "help":
       default: {
         console.log(`
-Project Context OS CLI (Phase 4 Universal)
+Project Context OS CLI (Phase 6 Universal)
 =========================================
+Remote Synchronization (Phase 6):
+  sync [--force] [--dry-run] [--json]  Synchronize Crux semantic context to remote store
+  sync-status [--json]                 Inspect local context synchronization status
+
 Universalization & Lifecycle Commands:
   init [--name <name>] [--root <dir>]  Scaffold .project-context/ and client configs
   doctor [--root <dir>] [--json]       Run complete installation & health diagnostics

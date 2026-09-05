@@ -18,11 +18,13 @@
     "README.md"
   ],
   "scripts": {
+    "start": "node integrations/chatgpt/index.js",
     "mcp": "node bin/project-context.js mcp",
     "test": "node tests/run-all-tests.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
+    "mcp-use": "^2.4.2",
     "zod": "^3.24.2"
   },
   "keywords": [
